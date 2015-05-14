@@ -1,0 +1,41 @@
+*SEGUNDA PARTE*
+
+archivos nuevos:
+frame, pila: tigerframe.sig/sml, tigerpila.sig/sml
+generacion de codigo: tigertrans.sig/sml (completar)
+tree: tigertree.sml, tigerit.sml
+canonizador: tigercanon.sig/sml
+interprete: tigerinterp.sml
+
+archivos modificados:
+tigersres.sml
+tigerseman.sml (hay que agregar las nuevas al nuestro)
+
+1) tigerframe.frag list
+frag = STRING of tigertemp.label * string
+     | PROC of {body:tigertree.stm, frame:frame}
+
+2) los frags de STRING no se tocan. Los PROC, si. tigertree.stm->tigertree.stm list
+por que?: porque el canonizador lo transforma de un arbol de SEQ a una lista de instrucciones
+
+Ejemplo: let type R = {a:string, b:int}
+             var v:=R {a="Hola", b=10}
+             function f(x:int):int=v.b+x
+             in f(343) end
+             
+1) STRING(l0, "Hola")
+2) PROC para f
+    -MOVE(T1, MEM(BP+16)-8) (* T1=&v *)
+    -MOVE(RV, MEM(T1+8)+T2)
+3) PROC para _tigermain
+    -MOVE(T3, CALL("AllocRecord", CONST 2, NAME l0, CONST 10))
+    -MOVE(MEM(BP-8), T3)
+    -MOVE(RV, CALL("f", BP, CONST 343))
+
+
+
+
+
+
+AST                  Tree(no canonizado)   Tree(canonizado)
+---->[TIPADO/GENER DE COD]---->[CANONIZADOR]---->[INTERPRETE]
