@@ -1,0 +1,8 @@
+tiger
+*.ui
+*.uo
+*.output
+tigergrm.sig
+tigergrm.sml
+tigerlex.sml
+*.sw*
