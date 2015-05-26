@@ -1,10 +1,13 @@
 structure tigertips =
 struct
 
+datatype R = RO | RW
+
 type unique = unit ref
+
 datatype Tipo = TUnit
 	| TNil
-	| TInt
+	| TInt of R
 	| TString
 	| TArray of Tipo * unique
 	| TRecord of (string * Tipo * int) list * unique

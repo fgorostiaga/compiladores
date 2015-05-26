@@ -2,7 +2,7 @@ open tigerlex
 open tigergrm
 open tigerescap
 open tigerseman
-open BasicIO Nonstdio
+open BasicIO Nonstdio Process
 
 fun lexstream(is: instream) =
 	Lexing.createLexer(fn b => fn n => buff_input is b 0 n);
@@ -32,6 +32,6 @@ fun main(args) =
 	in
 		transProg(expr);
 		print "yes!!\n"
-	end	handle Fail s => print("Fail: "^s^"\n")
+	end	handle Fail s => ( print("Fail: "^s^"\n"); exit failure )
 
 val _ = main(CommandLine.arguments())
