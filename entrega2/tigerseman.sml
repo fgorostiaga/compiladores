@@ -186,7 +186,7 @@ fun transExp(venv, tenv) =
 				| verificar n ((s,t,_)::cs) ((sy,{exp,ty})::ds) =
 						if s<>sy then error("Error de campo", nl)
 						else if tiposIguales ty t then (exp, n)::(verificar (n+1) cs ds)
-							 else error("Error de tipo del campo "^s, nl)
+							else error("Error de tipo del campo "^s, nl)
 				val lf = verificar 0 cs tfields
 			in
 				{exp=recordExp lf, ty=tyr}
@@ -269,7 +269,7 @@ fun transExp(venv, tenv) =
 			if (!pilawhile)=[] then error("Break fuera de While",nl) else {exp=nilExp(), ty=TUnit} (*COMPLETAR*)
 		| trexp(ArrayExp({typ, size, init}, nl)) =
 			let fun gettipoarray (TArray (s,_)) = s
-				|gettipoarray _ = error("El tipo no es un arreglo", nl)		 
+				|gettipoarray _ = error("El tipo no es un arreglo", nl)		
 			
 				val {exp=esize, ty=tisize} = trexp size
 				val {exp=einit, ty=tinit} = trexp init
@@ -318,46 +318,46 @@ fun transExp(venv, tenv) =
 		and trdec (venv, tenv) (VarDec ({name,escape,typ=NONE,init},pos)) = 
 			let
 				fun gettype(init) = let val {exp=_, ty=ti} = transExp(venv, tenv) init
-									   in (case ti of TNil => raise Fail "Nil not constrained"
-													 | t => t) end
+									in (case ti of TNil => raise Fail "Nil not constrained"
+													| t => t) end
 			in (tabRInserta (name,Var {ty = (gettype(init))} , venv), tenv, []) end (*COMPLETAR*)
 		| trdec (venv,tenv) (VarDec ({name,escape,typ=SOME s,init},pos)) =
 			let
 				fun gettype(s, init) = let val ti = (case tabBusca(s,tenv) of SOME t => tipoReal t
-																			 |NONE => error("no existe el tipo", pos))
-										   val {exp=_, ty=td} = transExp(venv, tenv) init
-										   val _ = mychecktipo ti td pos
-									   in ti end
+																			|NONE => error("no existe el tipo", pos))
+											val {exp=_, ty=td} = transExp(venv, tenv) init
+											val _ = mychecktipo ti td pos
+										in ti end
 			in (tabRInserta (name,Var {ty = (gettype(s, init))} , venv), tenv, []) end (*COMPLETAR*)
 		| trdec (venv,tenv) (FunctionDec fs) =
 			let fun solvetipo (NONE) = TUnit
-				   |solvetipo(SOME t) = (case tabBusca(t,tenv) of SOME t => tipoReal t
+					|solvetipo(SOME t) = (case tabBusca(t,tenv) of SOME t => tipoReal t
 																|NONE => raise Fail ("no existe el tipo\n"))
 				fun transTy(NameTy s) = solvetipo(SOME s)
 					|transTy _ = raise Fail "error en argumentos a funcion"
 					
 				val _ = checkrep (List.map (fn (a,b)=> #name(a)) fs) "funciones"
-				   
+				
 				fun add ([],env) = env
-				   |add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = add (fs, tabRInserta(f, Func {level=(), label=tigertemp.newlabel(), formals= (List.map (fn p => transTy(#typ p)) ps), result = solvetipo(r), extern=false}, env))
+					|add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = add (fs, tabRInserta(f, Func {level=(), label=tigertemp.newlabel(), formals= (List.map (fn p => transTy(#typ p)) ps), result = solvetipo(r), extern=false}, env))
 				
 				fun checkformals([],_) = ()
 					|checkformals ({name= n0, escape= b, typ= ty}::ps,i) = let fun inlist({name= n0, escape= _, typ= _}, []) = false
-													 |inlist({name= n0, escape= b, typ= t}, ({name= n1, escape= _, typ= _}::xs)) = if n0=n1 then true else inlist({name= n0, escape= b, typ= t}, xs)					
-					in if inlist({name= n0, escape= b, typ= ty},ps) then error("Repeticion de formal "^n0,i) else checkformals(ps,i) end
+																					|inlist({name= n0, escape= b, typ= t}, ({name= n1, escape= _, typ= _}::xs)) = if n0=n1 then true else inlist({name= n0, escape= b, typ= t}, xs)
+																			in if inlist({name= n0, escape= b, typ= ty},ps) then error("Repeticion de formal "^n0,i) else checkformals(ps,i) end
 				
-				   
+				
 				fun addformals(env, [],_) = env
-				   |addformals(env, ({name= n, escape= b, typ= ty}::ps),i) = addformals(tabRInserta(n, Var {ty = transTy(ty)} , env), ps,i)
-				   
+					|addformals(env, ({name= n, escape= b, typ= ty}::ps),i) = addformals(tabRInserta(n, Var {ty = transTy(ty)} , env), ps,i)
+				
 				fun checkf([], env) = ()
 					|checkf((({name=f, params=ps, result=r, body=b}, i)::fs),env) = let	val _ = checkformals(ps, i)
-																						   val {exp=e, ty=t} = transExp(addformals(env,ps,i), tenv) b
-																						   val _ = mychecktipo (solvetipo(r)) t i
-																						   in () end
+																						val {exp=e, ty=t} = transExp(addformals(env,ps,i), tenv) b
+																						val _ = mychecktipo (solvetipo(r)) t i
+																					in () end
 				fun addycheck (fs, env) = let val nenv = add(fs, env)
-											  val _ = checkf(fs,nenv)
-										  in nenv end
+												val _ = checkf(fs,nenv)
+											in nenv end
 			in 
 				(addycheck(fs, venv), tenv, []) end (*COMPLETAR*)
 		| trdec (venv,tenv) (TypeDec ts) =
@@ -375,7 +375,7 @@ fun transExp(venv, tenv) =
 				fun addtotenvnone((({name = n, ty=NameTy a},_)::ds), tenv) = let val ntenv = addtotenvnone(ds, tenv) in tabRInserta(n, TTipo (a, ref NONE), ntenv) end
 					|addtotenvnone((({name = n, ty=ArrayTy a},_)::ds), tenv) = let val _ = print (" AGREGANDO "^n) val ntenv = addtotenvnone(ds, tenv) in tabRInserta(n, TArray (TTipo (a, ref NONE), ref ()), ntenv) end
 					|addtotenvnone((({name = n, ty=RecordTy fds},_)::ds), tenv) = let
-														 fun uniq [] = []
+														fun uniq [] = []
 															|uniq [a] = [a]
 															|uniq (h::(x as (i::t))) = if ((#name h)=(#name i)) then raise Fail ("Se repiten nombres en el record\n") else uniq x
 														fun sort [] = []
@@ -389,16 +389,16 @@ fun transExp(venv, tenv) =
 														val lista = sort fds
 														val _ = uniq lista
 													in tabRInserta(n, TRecord (numerar fds 0, ref ()), ntenv) end
-					 |addtotenvnone([],tenv)=tenv
+					|addtotenvnone([],tenv)=tenv
 				
 				
-				 fun addtotenv((({name = n, ty=t},_)::ds), tenv) = let val ntenv = addtotenv(ds, tenv)
+				fun addtotenv((({name = n, ty=t},_)::ds), tenv) = let val ntenv = addtotenv(ds, tenv)
 											val _ = print (" Actualiza "^n)
 											val _ = if tabEsta(n,ntenv) then (case tabSaca (n,ntenv) of TTipo (a,b)=> b:=SOME (solvety(a,ntenv))
-																		 |TArray (TTipo (a,b),_) => b:=SOME (solvety(a,ntenv))
-																		 |TRecord (fds, _) => (List.map (fn (_,x,_) => (case x of TTipo (a,b) =>b:=SOME (solvety(a,ntenv))
+																		|TArray (TTipo (a,b),_) => b:=SOME (solvety(a,ntenv))
+																		|TRecord (fds, _) => (List.map (fn (_,x,_) => (case x of TTipo (a,b) =>b:=SOME (solvety(a,ntenv))
 																									|_ => raise Fail "No aplicado sobre TTipo!!")) fds;())
-																		 | _ => raise Fail "nada") else raise Fail (n^" no existe")
+																		| _ => raise Fail "nada") else raise Fail (n^" no existe")
 										in ntenv end
 					|addtotenv([],tenv)=tenv
 
