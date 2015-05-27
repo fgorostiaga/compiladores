@@ -246,7 +246,8 @@ fun transExp(venv, tenv) =
 				val _ = mychecktipo tlo (TInt RW) nl
 				val {exp = ehi, ty = thi} = trexp hi
 				val _ = mychecktipo thi (TInt RW) nl
-				val nenv = tabRInserta (var, Var {ty = TInt RO} , venv)
+				(*val nenv = tabRInserta (var, Var {ty = TInt RO} , venv)*)
+				val (nenv, _, expsdec) = let val myDecl = VarDec ({name=var,escape=escape,typ=NONE,init=lo},nl) in trdec (venv, tenv) myDecl end
 				val {exp = e, ty = tbody} = transExp(nenv, tenv) body
 				val _ = mychecktipo tbody TUnit nl
 			in
@@ -283,7 +284,7 @@ fun transExp(venv, tenv) =
 			
 		and trvar(SimpleVar s, nl) =
 			let
-				val t = (case tabBusca(s, venv) of SOME (Var {ty=t}) => t
+				val t = (case tabBusca(s, venv) of SOME (Var {ty=t, access=_, level=_}) => t
 							|SOME (Func _) => error(s^" es una funcion", nl)
 							| _ => error(s^": no existe", nl))
 			in
@@ -301,7 +302,7 @@ fun transExp(venv, tenv) =
 			in
 				{exp=nilExp(), ty=td}
 			end (*COMPLETAR*)
-		| trvar(SubscriptVar(v, e), nl) =
+		| trvar(SubscriptVar(v, i), nl) =
 			let
 				val {exp=e, ty=ti} = trvar(v,nl)
 				val {exp = e2, ty=td} = trexp i
