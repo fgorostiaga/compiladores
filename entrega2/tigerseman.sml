@@ -316,11 +316,50 @@ fun transExp(venv, tenv) =
 				{exp=nilExp(), ty=typ}
 			end (*COMPLETAR*)
 		and trdec (venv, tenv) (VarDec ({name,escape,typ=NONE,init},pos)) = 
-			(venv, tenv, []) (*COMPLETAR*)
+			let
+				fun gettype(init) = let val {exp=_, ty=ti} = transExp(venv, tenv) init
+									   in (case ti of TNil => raise Fail "Nil not constrained"
+													 | t => t) end
+			in (tabRInserta (name,Var {ty = (gettype(init))} , venv), tenv, []) end (*COMPLETAR*)
 		| trdec (venv,tenv) (VarDec ({name,escape,typ=SOME s,init},pos)) =
-			(venv, tenv, []) (*COMPLETAR*)
+			let
+				fun gettype(s, init) = let val ti = (case tabBusca(s,tenv) of SOME t => tipoReal t
+																			 |NONE => error("no existe el tipo", pos))
+										   val {exp=_, ty=td} = transExp(venv, tenv) init
+										   val _ = mychecktipo ti td pos
+									   in ti end
+			in (tabRInserta (name,Var {ty = (gettype(s, init))} , venv), tenv, []) end (*COMPLETAR*)
 		| trdec (venv,tenv) (FunctionDec fs) =
-			(venv, tenv, []) (*COMPLETAR*)
+			let fun solvetipo (NONE) = TUnit
+				   |solvetipo(SOME t) = (case tabBusca(t,tenv) of SOME t => tipoReal t
+																|NONE => raise Fail ("no existe el tipo\n"))
+				fun transTy(NameTy s) = solvetipo(SOME s)
+					|transTy _ = raise Fail "error en argumentos a funcion"
+					
+				val _ = checkrep (List.map (fn (a,b)=> #name(a)) fs) "funciones"
+				   
+				fun add ([],env) = env
+				   |add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = add (fs, tabRInserta(f, Func {level=(), label=tigertemp.newlabel(), formals= (List.map (fn p => transTy(#typ p)) ps), result = solvetipo(r), extern=false}, env))
+				
+				fun checkformals([],_) = ()
+					|checkformals ({name= n0, escape= b, typ= ty}::ps,i) = let fun inlist({name= n0, escape= _, typ= _}, []) = false
+													 |inlist({name= n0, escape= b, typ= t}, ({name= n1, escape= _, typ= _}::xs)) = if n0=n1 then true else inlist({name= n0, escape= b, typ= t}, xs)					
+					in if inlist({name= n0, escape= b, typ= ty},ps) then error("Repeticion de formal "^n0,i) else checkformals(ps,i) end
+				
+				   
+				fun addformals(env, [],_) = env
+				   |addformals(env, ({name= n, escape= b, typ= ty}::ps),i) = addformals(tabRInserta(n, Var {ty = transTy(ty)} , env), ps,i)
+				   
+				fun checkf([], env) = ()
+					|checkf((({name=f, params=ps, result=r, body=b}, i)::fs),env) = let	val _ = checkformals(ps, i)
+																						   val {exp=e, ty=t} = transExp(addformals(env,ps,i), tenv) b
+																						   val _ = mychecktipo (solvetipo(r)) t i
+																						   in () end
+				fun addycheck (fs, env) = let val nenv = add(fs, env)
+											  val _ = checkf(fs,nenv)
+										  in nenv end
+			in 
+				(addycheck(fs, venv), tenv, []) end (*COMPLETAR*)
 		| trdec (venv,tenv) (TypeDec ts) =
 			let 
 				fun adddep (({name=n, ty=NameTy t},_), l) = ((t,n)::l)
