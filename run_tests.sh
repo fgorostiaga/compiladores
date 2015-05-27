@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in tests/bad/*.tig; do
+for i in ../tests/bad/*.tig; do
 	if ./tiger "$i" &>/dev/null; then
 		echo -e "\nTest $i FAILED" ;
 		exit 1 ;
@@ -8,7 +8,7 @@ for i in tests/bad/*.tig; do
 		echo -n "." ;
 	fi
 done
-for i in tests/good/*.tig; do
+for i in ../tests/good/*.tig; do
 	if ./tiger "$i" &>/dev/null; then
 		echo -n "." ;
 	else
