@@ -89,6 +89,8 @@ fun tiposIguales (TRecord _) TNil = true
 	| tiposIguales (TInt _) (TInt _) = true
 	| tiposIguales a b = (a=b)
 
+fun mockVar ty = Var {ty = ty, access = allocLocal outermost false, level=0}
+
 fun isInt (TInt _) = true
 	| isInt _ = false
 
@@ -246,8 +248,8 @@ fun transExp(venv, tenv) =
 				val _ = mychecktipo tlo (TInt RW) nl
 				val {exp = ehi, ty = thi} = trexp hi
 				val _ = mychecktipo thi (TInt RW) nl
-				(*val nenv = tabRInserta (var, Var {ty = TInt RO} , venv)*)
-				val (nenv, _, expsdec) = let val myDecl = VarDec ({name=var,escape=escape,typ=NONE,init=lo},nl) in trdec (venv, tenv) myDecl end
+				val nenv = tabRInserta (var, mockVar (TInt RO) , venv)
+				(*val (nenv, _, expsdec) = let val myDecl = VarDec ({name=var,escape=escape,typ=NONE,init=lo},nl) in trdec (venv, tenv) myDecl end*)
 				val {exp = e, ty = tbody} = transExp(nenv, tenv) body
 				val _ = mychecktipo tbody TUnit nl
 			in
@@ -320,44 +322,43 @@ fun transExp(venv, tenv) =
 				fun gettype(init) = let val {exp=_, ty=ti} = transExp(venv, tenv) init
 									in (case ti of TNil => raise Fail "Nil not constrained"
 													| t => t) end
-			in (tabRInserta (name,Var {ty = (gettype(init))} , venv), tenv, []) end (*COMPLETAR*)
+			in (tabRInserta (name, mockVar (gettype (init)) , venv), tenv, []) end (*COMPLETAR*)
 		| trdec (venv,tenv) (VarDec ({name,escape,typ=SOME s,init},pos)) =
 			let
 				fun gettype(s, init) = let val ti = (case tabBusca(s,tenv) of SOME t => tipoReal t
-																			|NONE => error("no existe el tipo", pos))
-											val {exp=_, ty=td} = transExp(venv, tenv) init
-											val _ = mychecktipo ti td pos
-										in ti end
-			in (tabRInserta (name,Var {ty = (gettype(s, init))} , venv), tenv, []) end (*COMPLETAR*)
+									|NONE => error("no existe el tipo", pos))
+								val {exp=_, ty=td} = transExp(venv, tenv) init
+								val _ = mychecktipo ti td pos
+							in ti end
+			in (tabRInserta (name, mockVar (gettype(s, init)) , venv), tenv, []) end (*COMPLETAR*)
 		| trdec (venv,tenv) (FunctionDec fs) =
 			let fun solvetipo (NONE) = TUnit
 					|solvetipo(SOME t) = (case tabBusca(t,tenv) of SOME t => tipoReal t
-																|NONE => raise Fail ("no existe el tipo\n"))
+											|NONE => raise Fail ("no existe el tipo\n"))
 				fun transTy(NameTy s) = solvetipo(SOME s)
 					|transTy _ = raise Fail "error en argumentos a funcion"
 					
 				val _ = checkrep (List.map (fn (a,b)=> #name(a)) fs) "funciones"
 				
 				fun add ([],env) = env
-					|add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = add (fs, tabRInserta(f, Func {level=(), label=tigertemp.newlabel(), formals= (List.map (fn p => transTy(#typ p)) ps), result = solvetipo(r), extern=false}, env))
+					|add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = add (fs, tabRInserta(f, Func {level=outermost, label=tigertemp.newlabel(), formals= (List.map (fn p => transTy(#typ p)) ps), result = solvetipo(r), extern=false}, env))
 				
 				fun checkformals([],_) = ()
 					|checkformals ({name= n0, escape= b, typ= ty}::ps,i) = let fun inlist({name= n0, escape= _, typ= _}, []) = false
-																					|inlist({name= n0, escape= b, typ= t}, ({name= n1, escape= _, typ= _}::xs)) = if n0=n1 then true else inlist({name= n0, escape= b, typ= t}, xs)
-																			in if inlist({name= n0, escape= b, typ= ty},ps) then error("Repeticion de formal "^n0,i) else checkformals(ps,i) end
-				
+													|inlist({name= n0, escape= b, typ= t}, ({name= n1, escape= _, typ= _}::xs)) = if n0=n1 then true else inlist({name= n0, escape= b, typ= t}, xs)
+												in if inlist({name= n0, escape= b, typ= ty},ps) then error("Repeticion de formal "^n0,i) else checkformals(ps,i) end
 				
 				fun addformals(env, [],_) = env
-					|addformals(env, ({name= n, escape= b, typ= ty}::ps),i) = addformals(tabRInserta(n, Var {ty = transTy(ty)} , env), ps,i)
+					|addformals(env, ({name= n, escape= b, typ= ty}::ps),i) = addformals(tabRInserta(n, mockVar (transTy (ty)) , env), ps,i)
 				
 				fun checkf([], env) = ()
-					|checkf((({name=f, params=ps, result=r, body=b}, i)::fs),env) = let	val _ = checkformals(ps, i)
-																						val {exp=e, ty=t} = transExp(addformals(env,ps,i), tenv) b
-																						val _ = mychecktipo (solvetipo(r)) t i
-																					in () end
+					|checkf((({name=f, params=ps, result=r, body=b}, i)::fs),env) = let val _ = checkformals(ps, i)
+														val {exp=e, ty=t} = transExp(addformals(env,ps,i), tenv) b
+														val _ = mychecktipo (solvetipo(r)) t i
+													in () end
 				fun addycheck (fs, env) = let val nenv = add(fs, env)
-												val _ = checkf(fs,nenv)
-											in nenv end
+								val _ = checkf(fs,nenv)
+							in nenv end
 			in 
 				(addycheck(fs, venv), tenv, []) end (*COMPLETAR*)
 		| trdec (venv,tenv) (TypeDec ts) =

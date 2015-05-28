@@ -203,6 +203,7 @@ fun whileExp {test: exp, body: exp, lev:level} =
 let
 	val cf = unCx test
 	val expb = unNx body
+	val _ = preWhileForExp() (*lo agrego villeramente yo*)
 	val (l1, l2, l3) = (newlabel(), newlabel(), topSalida())
 in
 	Nx (seq[LABEL l1,
