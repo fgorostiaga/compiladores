@@ -177,8 +177,10 @@ fun callExp (name,external,isproc,lev:level,ls) =
 fun letExp ([], body) = Ex (unEx body)
  |  letExp (inits, body) = Ex (ESEQ(seq inits,unEx body))
 
-fun breakExp() = 
-	Ex (CONST 0) (*COMPLETAR*)
+fun breakExp() = let
+			val _ = topSalida ()
+		in
+	Ex (CONST 0) (*COMPLETAR*) end
 
 fun seqExp ([]:exp list) = Nx (EXP(CONST 0))
 	| seqExp (exps:exp list) =
@@ -203,7 +205,6 @@ fun whileExp {test: exp, body: exp, lev:level} =
 let
 	val cf = unCx test
 	val expb = unNx body
-	val _ = preWhileForExp() (*lo agrego villeramente yo*)
 	val (l1, l2, l3) = (newlabel(), newlabel(), topSalida())
 in
 	Nx (seq[LABEL l1,

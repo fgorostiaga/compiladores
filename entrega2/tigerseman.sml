@@ -100,7 +100,7 @@ fun mychecktipo a b nl = if not (tiposIguales a b) then (error("error de tipos",
 
 fun transExp(venv, tenv) =
 
-	let val pilawhile= ref []
+	let
 		fun solvety (ty, tenv) = if tabEsta(ty, tenv) then (tabSaca(ty, tenv)) else raise Fail "Error de tipos. Tipo inexistente en la tabla"
 		fun trexp(VarExp v) = trvar(v)
 		| trexp(UnitExp _) = {exp=unitExp(), ty=TUnit}
@@ -234,11 +234,12 @@ fun transExp(venv, tenv) =
 		| trexp(WhileExp({test, body}, nl)) =
 			let
 				val ttest = trexp test
-				val _ = pilawhile := ()::(!pilawhile)
+				val _ = preWhileForExp ()
 				val tbody = trexp body
-				val _ = pilawhile := List.tl (!pilawhile)
 			in
-				if isInt (tipoReal (#ty ttest)) andalso #ty tbody = TUnit then {exp=whileExp {test=(#exp ttest), body=(#exp tbody), lev=topLevel()}, ty=TUnit}
+				if isInt (tipoReal (#ty ttest)) andalso #ty tbody = TUnit then let val retval = {exp=whileExp {test=(#exp ttest), body=(#exp tbody), lev=topLevel()}, ty=TUnit}
+													val _ = postWhileForExp ()
+												in retval end
 				else if not (isInt(tipoReal (#ty ttest))) then error("Error de tipo en la condición", nl)
 				else error("El cuerpo de un while no puede devolver un valor", nl)
 			end
@@ -268,7 +269,7 @@ fun transExp(venv, tenv) =
 				{exp=seqExp(expdecs@[expbody]), ty=tybody}
 			end
 		| trexp(BreakExp nl) =
-			if (!pilawhile)=[] then error("Break fuera de While",nl) else {exp=nilExp(), ty=TUnit} (*COMPLETAR*)
+			(*if (topSalida ()) = NONE then error("Break fuera de While",nl) else*) {exp=breakExp(), ty=TUnit} (*COMPLETAR*)
 		| trexp(ArrayExp({typ, size, init}, nl)) =
 			let fun gettipoarray (TArray (s,_)) = s
 				|gettipoarray _ = error("El tipo no es un arreglo", nl)		
