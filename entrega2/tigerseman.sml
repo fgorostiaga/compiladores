@@ -412,6 +412,7 @@ fun transExp(venv, tenv) =
 					LetExp({decs=[FunctionDec[({name="_tigermain", params=[],
 									result=SOME "int", body=SeqExp([ex, IntExp(0,0)],0)}, 0)]],
 							body=UnitExp 0}, 0)
-			val _ = transExp(tab_vars, tab_tipos) main
+			val {exp = e, ty = tbody} = transExp(tab_vars, tab_tipos) main
+			val _ = print (tigertrans.ppEXP e)
 		in	print "bien!\n" end
 	end

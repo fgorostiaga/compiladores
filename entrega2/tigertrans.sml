@@ -244,5 +244,8 @@ fun binOpIntRelExp {left,oper,right} =
 fun binOpStrExp {left,oper,right} =
 	Ex (CONST 0) (*COMPLETAR*)
 
+fun ppEXP (Ex e) = "EX (" ^ (tigertree.ppEXP e) ^ ")"
+	| ppEXP (Nx s) = "NX (" ^ (tigertree.ppSTM s) ^ ")"
+	| ppEXP (Cx f) = "CX algo"
 
 end
