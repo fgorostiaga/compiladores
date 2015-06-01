@@ -298,7 +298,7 @@ fun transExp(venv, tenv) =
 				val {exp=e, ty=ti} = trvar(v, nl)
 				fun fields (TRecord (xs,_)) = xs
 					|fields _ = error("No es record", nl)
-				val _ = printlist (List.map (fn (n,_,_)=>n) (fields (tipoReal ti)))
+				(*val _ = printlist (List.map (fn (n,_,_)=>n) (fields (tipoReal ti)))*)
 				fun gettypeof ([],_) = error(s^" no es un miembro", nl)
 					|gettypeof (((name, ty, _)::xs), s) = if name=s then ty else gettypeof (xs,s)
 				val td = gettypeof(fields (tipoReal ti), s)
@@ -370,12 +370,12 @@ fun transExp(venv, tenv) =
 				fun creargrafo ts = List.foldl adddep [] ts
 				fun ordenar g = topsort.topsort g
 				val ordenado = ordenar (creargrafo ts)
-				val _ = printlist ordenado
+				(*val _ = printlist ordenado*)
 
 				val _ = checkrep (List.map (fn (a,b) => #name(a)) ts) "tipos"
 
 				fun addtotenvnone((({name = n, ty=NameTy a},_)::ds), tenv) = let val ntenv = addtotenvnone(ds, tenv) in tabRInserta(n, TTipo (a, ref NONE), ntenv) end
-					|addtotenvnone((({name = n, ty=ArrayTy a},_)::ds), tenv) = let val _ = print (" AGREGANDO "^n) val ntenv = addtotenvnone(ds, tenv) in tabRInserta(n, TArray (TTipo (a, ref NONE), ref ()), ntenv) end
+					|addtotenvnone((({name = n, ty=ArrayTy a},_)::ds), tenv) = let (*val _ = print (" AGREGANDO "^n)*) val ntenv = addtotenvnone(ds, tenv) in tabRInserta(n, TArray (TTipo (a, ref NONE), ref ()), ntenv) end
 					|addtotenvnone((({name = n, ty=RecordTy fds},_)::ds), tenv) = let
 														fun uniq [] = []
 															|uniq [a] = [a]
@@ -395,7 +395,7 @@ fun transExp(venv, tenv) =
 				
 				
 				fun addtotenv((({name = n, ty=t},_)::ds), tenv) = let val ntenv = addtotenv(ds, tenv)
-											val _ = print (" Actualiza "^n)
+											(*val _ = print (" Actualiza "^n)*)
 											val _ = if tabEsta(n,ntenv) then (case tabSaca (n,ntenv) of TTipo (a,b)=> b:=SOME (solvety(a,ntenv))
 																		|TArray (TTipo (a,b),_) => b:=SOME (solvety(a,ntenv))
 																		|TRecord (fds, _) => (List.map (fn (_,x,_) => (case x of TTipo (a,b) =>b:=SOME (solvety(a,ntenv))
