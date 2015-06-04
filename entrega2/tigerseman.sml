@@ -109,7 +109,7 @@ fun transExp(venv, tenv) =
 		| trexp(StringExp(s, _)) = {exp=stringExp(s), ty=TString}
 		| trexp(CallExp({func=f, args}, nl)) =
 			let
-				val (TArgs, ext, TRet, lab, lev) =
+				val (TArgs, ext, TRet, lev, lab) =
 				case tabBusca (f, venv) of
 					SOME (Func {formals, extern, result, level, label}) => (formals, extern, result, level, label)
 					|SOME _ => error(f^": no es funcion", nl)
@@ -124,7 +124,7 @@ fun transExp(venv, tenv) =
 				val leargs = aux TArgs args []
 				val leargs' = map (fn {exp, ty} => exp) leargs
 				val pf = TRet = TUnit
-			in {exp=nilExp(), ty=TRet} end (*COMPLETAR*)
+			in {exp=callExp (lab, ext, pf, lev, leargs'), ty=TRet} end (*COMPLETAR pponele que ya esta*)
 		| trexp(OpExp({left, oper=EqOp, right}, nl)) =
 			let
 				val {exp=expl, ty=tyl} = trexp left
@@ -201,17 +201,17 @@ fun transExp(venv, tenv) =
 			in { exp=seqExp (exprs), ty=tipo } end
 		| trexp(AssignExp({var=SimpleVar s, exp}, nl)) =
 			let
-				val {exp = e, ty=ti} = trvar(SimpleVar s,nl)
+				val {exp = e0, ty=ti} = trvar(SimpleVar s,nl)
 				val _ = if (ti=TInt RO) then raise Fail (s^" no asignable") else ()
-				val {exp = e, ty = td} = trexp exp
+				val {exp = e1, ty = td} = trexp exp
 				val _ = mychecktipo ti td nl
-			in {exp=nilExp(), ty=TUnit} (*COMPLETAR*) end
+			in {exp=assignExp {var=e0,exp=e1}, ty=TUnit} (*COMPLETAR capaz que ya esta*) end
 		| trexp(AssignExp({var, exp}, nl)) =
 			let
-				val {exp = e, ty=ti} = trvar (var, nl)
-				val {exp = e, ty=td} = trexp exp
+				val {exp = e0, ty=ti} = trvar (var, nl)
+				val {exp = e1, ty=td} = trexp exp
 				val _ = mychecktipo ti td nl
-			in {exp=nilExp(), ty=TUnit} end (*COMPLETAR*)
+			in {exp=assignExp {var=e0,exp=e1}, ty=TUnit} end (*COMPLETAR capaz que ya esta*)
 		| trexp(IfExp({test, then', else'=SOME else'}, nl)) =
 			let
 				val {exp=testexp, ty=tytest} = trexp test
@@ -251,7 +251,7 @@ fun transExp(venv, tenv) =
 				val _ = mychecktipo thi (TInt RW) nl
 				val nenv = tabRInserta (var, mockVar (TInt RO) , venv)
 				(*val (nenv, _, expsdec) = let val myDecl = VarDec ({name=var,escape=escape,typ=NONE,init=lo},nl) in trdec (venv, tenv) myDecl end*)
-				val {exp = e, ty = tbody} = transExp(nenv, tenv) body
+				val {exp = ebody, ty = tbody} = transExp(nenv, tenv) body
 				val _ = mychecktipo tbody TUnit nl
 			in
 				{exp=nilExp(), ty=TUnit} end (*COMPLETAR*)
@@ -287,12 +287,12 @@ fun transExp(venv, tenv) =
 			
 		and trvar(SimpleVar s, nl) =
 			let
-				val t = (case tabBusca(s, venv) of SOME (Var {ty=t, access=_, level=_}) => t
+				val (t,acc,l) = (case tabBusca(s, venv) of SOME (Var {ty=t, access=acc, level=l}) => (t,acc,l)
 							|SOME (Func _) => error(s^" es una funcion", nl)
 							| _ => error(s^": no existe", nl))
 			in
-				{exp=nilExp(), ty=t}
-			end (*COMPLETAR*)
+				{exp=simpleVar (acc, l), ty=t}
+			end (*COMPLETAR (capaz que ya esta) *)
 		| trvar(FieldVar(v, s), nl) =
 			let
 				val {exp=e, ty=ti} = trvar(v, nl)
