@@ -307,8 +307,8 @@ fun transExp(venv, tenv) =
 			end (*COMPLETAR, capaz que ya esta. Ponele.*)
 		| trvar(SubscriptVar(v, i), nl) =
 			let
-				val {exp=e, ty=ti} = trvar(v,nl)
-				val {exp = e2, ty=td} = trexp i
+				val {exp=evar, ty=ti} = trvar(v,nl)
+				val {exp = eind, ty=td} = trexp i
 				val _ = mychecktipo td (TInt RW) nl
 				fun tipo (TArray (t,_)) = t
 					|tipo (TRecord _) = error("ES trecord",nl)
@@ -316,8 +316,8 @@ fun transExp(venv, tenv) =
 					|tipo _ = error("No es un array", nl)
 				val typ = tipo (tipoReal ti)
 			in
-				{exp=nilExp(), ty=typ}
-			end (*COMPLETAR*)
+				{exp=subscriptVar (evar, eind), ty=typ}
+			end (*COMPLETAR, capaz que ya esta. Ponele.*)
 		and trdec (venv, tenv) (VarDec ({name,escape,typ=NONE,init},pos)) = 
 			let
 				fun gettype(init) = let val {exp=_, ty=ti} = transExp(venv, tenv) init
@@ -404,8 +404,8 @@ fun transExp(venv, tenv) =
 										in ntenv end
 					|addtotenv([],tenv)=tenv
 
-				in
-					(venv, addtotenv(ts, addtotenvnone(ts,tenv)), []) end (*COMPLETAR*)
+			in
+				(venv, addtotenv(ts, addtotenvnone(ts,tenv)), []) end (*COMPLETAR*)
 		in trexp end
 	fun transProg ex =
 		let	val main =
