@@ -269,7 +269,7 @@ fun transExp(venv, tenv) =
 				{exp=seqExp(expdecs@[expbody]), ty=tybody}
 			end
 		| trexp(BreakExp nl) =
-			(*if (topSalida ()) = NONE then error("Break fuera de While",nl) else*) {exp=breakExp(), ty=TUnit} (*COMPLETAR*)
+			{exp=breakExp(), ty=TUnit} (*COMPLETAR capaz que ya esta*)
 		| trexp(ArrayExp({typ, size, init}, nl)) =
 			let fun gettipoarray (TArray (s,_)) = s
 				|gettipoarray _ = error("El tipo no es un arreglo", nl)		
@@ -282,8 +282,8 @@ fun transExp(venv, tenv) =
 									|NONE => error("no existe el tipo", nl))
 				val _ = mychecktipo (gettipoarray realti) tinit nl
 			in
-				{exp=nilExp(), ty=realti}
-			end (*COMPLETAR*)
+				{exp=arrayExp {size=esize, init=einit}, ty=realti}
+			end (*COMPLETAR capaz que ya esta*)
 			
 		and trvar(SimpleVar s, nl) =
 			let
@@ -295,16 +295,16 @@ fun transExp(venv, tenv) =
 			end (*COMPLETAR (capaz que ya esta) *)
 		| trvar(FieldVar(v, s), nl) =
 			let
-				val {exp=e, ty=ti} = trvar(v, nl)
+				val {exp=evar, ty=ti} = trvar(v, nl)
 				fun fields (TRecord (xs,_)) = xs
 					|fields _ = error("No es record", nl)
 				(*val _ = printlist (List.map (fn (n,_,_)=>n) (fields (tipoReal ti)))*)
-				fun gettypeof ([],_) = error(s^" no es un miembro", nl)
-					|gettypeof (((name, ty, _)::xs), s) = if name=s then ty else gettypeof (xs,s)
-				val td = gettypeof(fields (tipoReal ti), s)
+				fun getTypeAndIndex ([],_,n) = error(s^" no es un miembro", nl)
+					|getTypeAndIndex (((name, ty, _)::xs), s,n) = if name=s then (ty,n) else getTypeAndIndex (xs,s,n+1)
+				val (td,index) = getTypeAndIndex(fields (tipoReal ti), s,0)
 			in
-				{exp=nilExp(), ty=td}
-			end (*COMPLETAR*)
+				{exp=fieldVar (evar, index), ty=td}
+			end (*COMPLETAR, capaz que ya esta. Ponele.*)
 		| trvar(SubscriptVar(v, i), nl) =
 			let
 				val {exp=e, ty=ti} = trvar(v,nl)
