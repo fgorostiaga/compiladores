@@ -251,10 +251,14 @@ fun transExp(venv, tenv) =
 				val _ = mychecktipo thi (TInt RW) nl
 				val nenv = tabRInserta (var, mockVar (TInt RO) , venv)
 				(*val (nenv, _, expsdec) = let val myDecl = VarDec ({name=var,escape=escape,typ=NONE,init=lo},nl) in trdec (venv, tenv) myDecl end*)
+				val _ = preWhileForExp ()
 				val {exp = ebody, ty = tbody} = transExp(nenv, tenv) body
 				val _ = mychecktipo tbody TUnit nl
 			in
-				{exp=nilExp(), ty=TUnit} end (*COMPLETAR*)
+				let val retval = {exp=nilExp(), ty=TUnit}
+					val _ = postWhileForExp ()
+				in retval end (*COMPLETAR*)
+			end
 		| trexp(LetExp({decs, body}, _)) =
 			let
 				fun aux (d, (v, t, exps1)) =
