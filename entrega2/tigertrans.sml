@@ -12,7 +12,6 @@ type level = {parent:frame option , frame: frame, level: int}
 type access = tigerframe.access
 
 type frag = tigerframe.frag
-val fraglist = ref ([]: frag list)
 
 val actualLevel = ref ~1 (* _tigermain debe tener level = 0. *)
 fun getActualLev() = !actualLevel
