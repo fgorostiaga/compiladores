@@ -142,8 +142,11 @@ fun simpleVar(acc, nivel) =
 
 fun varDec(acc) = simpleVar(acc, getActualLev())
 
-fun fieldVar(var, field) = 
-	Ex (CONST 0) (*COMPLETAR*)
+fun fieldVar(var, fieldindex) = 
+	let val varEx = unEx var in
+		Ex (BINOP (PLUS, varEx,
+					BINOP(MUL, CONST fieldindex, CONST tigerframe.wSz)))
+	end (*COMPLETAR capaz que ya esta*)
 
 fun subscriptVar(arr, ind) =
 let
@@ -159,15 +162,20 @@ in
 			BINOP(MUL, TEMP ri, CONST tigerframe.wSz)))))
 end
 
-fun recordExp l =
-	Ex (CONST 0) (*COMPLETAR*)
+fun recordExp ls =
+	let
+		val cuantos = CONST (length ls)
+		val exps = map (fn (exp, _) => unEx exp) ls
+	in
+	Ex (externalCall("_allocRecord", cuantos::exps))
+end (* COMPLETAR capaz que ya esta*)
 
 fun arrayExp{size, init} =
 let
 	val s = unEx size
 	val i = unEx init
 in
-	Ex (externalCall("allocArray", [s, i]))
+	Ex (externalCall("_initArray", [s, i]))
 end
 
 fun callExp (name,external,isproc,lev:level,ls) = 
@@ -177,9 +185,9 @@ fun letExp ([], body) = Ex (unEx body)
  |  letExp (inits, body) = Ex (ESEQ(seq inits,unEx body))
 
 fun breakExp() = let
-			val _ = topSalida ()
+			val l = topSalida ()
 		in
-	Ex (CONST 0) (*COMPLETAR*) end
+	Nx (JUMP (NAME l, [l])) (*COMPLETAR, capaz que ya esta*) end
 
 fun seqExp ([]:exp list) = Nx (EXP(CONST 0))
 	| seqExp (exps:exp list) =

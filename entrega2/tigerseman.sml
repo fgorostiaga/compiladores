@@ -280,7 +280,6 @@ fun transExp(venv, tenv) =
 			
 				val {exp=esize, ty=tisize} = trexp size
 				val {exp=einit, ty=tinit} = trexp init
-				val _ = print "AEXP "
 				val _ = mychecktipo tisize (TInt RW) nl
 				val realti = (case tabBusca(typ,tenv) of SOME t => tipoReal t
 									|NONE => error("no existe el tipo", nl))
@@ -352,7 +351,7 @@ fun transExp(venv, tenv) =
 				val _ = checkrep (List.map (fn (a,b)=> #name(a)) fs) "funciones"
 				
 				fun add ([],env) = env
-					|add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = add (fs, tabRInserta(f, Func {level=newLevel {parent=outermost (*TODO GET CURRENT LEVEL*), name=f, formals = (List.map (fn p => !(#escape p)) ps)}, label=tigertemp.newlabel(), formals= (List.map (fn p => transTy(#typ p)) ps), result = solvetipo(r), extern=false}, env))
+					|add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = add (fs, tabRInserta(f, Func {level=newLevel {parent=topLevel (), name=tigertemp.newlabel (), formals = (List.map (fn p => !(#escape p)) ps)}, label=tigertemp.newlabel(), formals= (List.map (fn p => transTy(#typ p)) ps), result = solvetipo(r), extern=false}, env))
 				
 				fun checkformals([],_) = ()
 					|checkformals ({name= n0, escape= b, typ= ty}::ps,i) = let fun inlist({name= n0, escape= _, typ= _}, []) = false
