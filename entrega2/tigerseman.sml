@@ -255,9 +255,9 @@ fun transExp(venv, tenv) =
 				val {exp = ebody, ty = tbody} = transExp(nenv, tenv) body
 				val _ = mychecktipo tbody TUnit nl
 			in
-				let val retval = {exp=forExp {lo=elo, hi=ehi, var=(*hd expsdec <-esto debe quedar, pero ahora es vacio :/*) elo, body=ebody}, ty=TUnit}
+				let val retval = {exp=forExp {lo=elo, hi=ehi, var=hd expsdec, body=ebody}, ty=TUnit}
 					val _ = postWhileForExp ()
-				in retval end (*COMPLETAR*)
+				in retval end (*COMPLETAR, capaz que ya esta*)
 			end
 		| trexp(LetExp({decs, body}, _)) =
 			let
@@ -324,18 +324,24 @@ fun transExp(venv, tenv) =
 			end (*COMPLETAR, capaz que ya esta. Ponele.*)
 		and trdec (venv, tenv) (VarDec ({name,escape,typ=NONE,init},pos)) = 
 			let
-				fun gettype(init) = let val {exp=_, ty=ti} = transExp(venv, tenv) init
+				fun gettype(init) = let val {exp=e, ty=ti} = transExp(venv, tenv) init
 									in (case ti of TNil => raise Fail "Nil not constrained"
-													| t => t) end
-			in (tabRInserta (name, mockVar (gettype (init)) , venv), tenv, []) end (*COMPLETAR*)
+													| t => (t,e)) end
+			in let val (ty,ex) = (gettype (init)) in
+					(tabRInserta (name, mockVar ty , venv), tenv, [ex])
+				end 
+			end (*COMPLETAR, capaz que ya esta*)
 		| trdec (venv,tenv) (VarDec ({name,escape,typ=SOME s,init},pos)) =
 			let
 				fun gettype(s, init) = let val ti = (case tabBusca(s,tenv) of SOME t => tipoReal t
 									|NONE => error("no existe el tipo", pos))
-								val {exp=_, ty=td} = transExp(venv, tenv) init
+								val {exp=e, ty=td} = transExp(venv, tenv) init
 								val _ = mychecktipo ti td pos
-							in ti end
-			in (tabRInserta (name, mockVar (gettype(s, init)) , venv), tenv, []) end (*COMPLETAR*)
+							in (ti,e) end
+			in let val (ty,ex) = (gettype (s, init)) in
+					(tabRInserta (name, mockVar ty , venv), tenv, [ex])
+				end 
+			end (*COMPLETAR, capaz que ya esta*)
 		| trdec (venv,tenv) (FunctionDec fs) =
 			let fun solvetipo (NONE) = TUnit
 					|solvetipo(SOME t) = (case tabBusca(t,tenv) of SOME t => tipoReal t
