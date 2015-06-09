@@ -255,7 +255,7 @@ fun transExp(venv, tenv) =
 				val {exp = ebody, ty = tbody} = transExp(nenv, tenv) body
 				val _ = mychecktipo tbody TUnit nl
 			in
-				let val retval = {exp=nilExp(), ty=TUnit}
+				let val retval = {exp=forExp {lo=elo, hi=ehi, var=(*hd expsdec <-esto debe quedar, pero ahora es vacio :/*) elo, body=ebody}, ty=TUnit}
 					val _ = postWhileForExp ()
 				in retval end (*COMPLETAR*)
 			end
