@@ -364,8 +364,12 @@ fun transExp(venv, tenv) =
 				fun addycheck (fs, env) = let val nenv = add(fs, env)
 								val _ = checkf(fs,nenv)
 							in nenv end
+				val _ = preFunctionDec ()
 			in 
-				(addycheck(fs, venv), tenv, []) end (*COMPLETAR*)
+				let val retval = (addycheck(fs, venv), tenv, [])
+					val _ = postFunctionDec ()
+				in retval end
+			end (*COMPLETAR*)
 		| trdec (venv,tenv) (TypeDec ts) =
 			let 
 				fun adddep (({name=n, ty=NameTy t},_), l) = ((t,n)::l)
