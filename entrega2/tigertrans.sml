@@ -103,6 +103,7 @@ fun procEntryExit{level: level, body} =
 	let	val label = STRING(name(#frame level), "")
 		val body' = PROC{frame= #frame level, body=unNx body}
 		val final = STRING(";;-------", "")
+		val _ = print ("ADDED "^ (name (#frame level))^"\n")
 	in	datosGlobs:=(!datosGlobs@[label, body', final]) end
 fun getResult() = !datosGlobs
 
@@ -179,8 +180,9 @@ in
 end
 
 fun callExp (name,external,isproc,lev:level,ls) = 
-	if external then let val ex = (externalCall (name, map (fn x => unEx x) ls)) in (*if isproc then Nx ex else*) Ex ex end else
-	Ex (CONST 3211530) (*COMPLETAR*)
+	let val ex = if external then (externalCall (name, map (fn x => unEx x) ls)) else
+		(CALL (NAME name, map (fn x => unEx x) ls))
+	in (*if isproc then Nx ex else*) Ex ex end (*COMPLETAR*)
 
 fun letExp ([], body) = Ex (unEx body)
  |  letExp (inits, body) = Ex (ESEQ(seq inits,unEx body))

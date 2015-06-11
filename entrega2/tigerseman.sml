@@ -350,7 +350,9 @@ fun transExp(venv, tenv) =
 				val _ = checkrep (List.map (fn (a,b)=> #name(a)) fs) "funciones"
 				
 				fun add ([],env) = env
-					|add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = let val myLabel = tigertemp.newlabel () in add (fs, tabRInserta(f, Func {level=newLevel {parent=topLevel (), name=myLabel, formals = (List.map (fn p => !(#escape p)) ps)}, label= myLabel, formals= (List.map (fn p => transTy(#typ p)) ps), result = solvetipo(r), extern=false}, env)) end
+					|add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = let val myLabel = tigertemp.newlabel ()
+						val _ = print ("LABEL FOR "^f^": "^myLabel^"\n")
+						in add (fs, tabRInserta(f, Func {level=newLevel {parent=topLevel (), name=myLabel, formals = (List.map (fn p => !(#escape p)) ps)}, label= myLabel, formals= (List.map (fn p => transTy(#typ p)) ps), result = solvetipo(r), extern=false}, env)) end
 				
 				fun checkformals([],_) = ()
 					|checkformals ({name= n0, escape= b, typ= ty}::ps,i) = let fun inlist({name= n0, escape= _, typ= _}, []) = false
@@ -366,7 +368,9 @@ fun transExp(venv, tenv) =
 														val _ = mychecktipo (solvetipo(r)) t i
 														val _ = let val (funLevel, isproc) = (case tabBusca (f, env) of
 																										SOME (Func {formals, extern, result, level, label}) => (level, result = TUnit)
-																										| _ => raise Fail "No deberia pasar") in functionDec (e,funLevel, isproc) end
+																										| _ => raise Fail "No deberia pasar")
+														val _ = checkf (fs,env)
+														in functionDec (e,funLevel, isproc) end
 													in () end
 				fun addycheck (fs, env) = let val nenv = add(fs, env)
 								val _ = checkf(fs,nenv)
