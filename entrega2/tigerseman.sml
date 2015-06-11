@@ -89,7 +89,7 @@ fun tiposIguales (TRecord _) TNil = true
 	| tiposIguales (TInt _) (TInt _) = true
 	| tiposIguales a b = (a=b)
 
-fun mockVar ty = Var {ty = ty, access = allocLocal outermost false, level=0}
+fun mockVar ty escap = Var {ty = ty, access = allocLocal (topLevel ()) escap, level=(getActualLev ())}
 
 fun isInt (TInt _) = true
 	| isInt _ = false
@@ -249,7 +249,6 @@ fun transExp(venv, tenv) =
 				val _ = mychecktipo tlo (TInt RW) nl
 				val {exp = ehi, ty = thi} = trexp hi
 				val _ = mychecktipo thi (TInt RW) nl
-				(*val nenv = tabRInserta (var, mockVar (TInt RO) , venv)*)
 				val (nenv, _, expsdec) = let val myDecl = VarDec ({name=var,escape=escape,typ=SOME "_intro",init=lo},nl) in trdec (venv, tenv) myDecl end
 				val _ = preWhileForExp ()
 				val {exp = ebody, ty = tbody} = transExp(nenv, tenv) body
@@ -327,9 +326,9 @@ fun transExp(venv, tenv) =
 									in (case ti of TNil => raise Fail "Nil not constrained"
 													| t => (t,e)) end
 			in let val (ty,ex) = (gettype (init)) in
-					(tabRInserta (name, mockVar ty , venv), tenv, [ex])
+					(tabRInserta (name, mockVar ty (!escape), venv), tenv, [ex])
 				end 
-			end (*COMPLETAR, capaz que ya esta*)
+			end (*COMPLETAR, capaz que ya esta, cuando saquemos mockVar*)
 		| trdec (venv,tenv) (VarDec ({name,escape,typ=SOME s,init},pos)) =
 			let
 				fun gettype(s, init) = let val ti = (case tabBusca(s,tenv) of SOME t => tipoReal t
@@ -338,9 +337,9 @@ fun transExp(venv, tenv) =
 								val _ = mychecktipo ti td pos
 							in (ti,e) end
 			in let val (ty,ex) = (gettype (s, init)) in
-					(tabRInserta (name, mockVar ty , venv), tenv, [ex])
+					(tabRInserta (name, mockVar ty (!escape), venv), tenv, [ex])
 				end 
-			end (*COMPLETAR, capaz que ya esta*)
+			end (*COMPLETAR, capaz que ya esta, cuando saquemos mockVar*)
 		| trdec (venv,tenv) (FunctionDec fs) =
 			let fun solvetipo (NONE) = TUnit
 					|solvetipo(SOME t) = (case tabBusca(t,tenv) of SOME t => tipoReal t
@@ -351,7 +350,7 @@ fun transExp(venv, tenv) =
 				val _ = checkrep (List.map (fn (a,b)=> #name(a)) fs) "funciones"
 				
 				fun add ([],env) = env
-					|add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = add (fs, tabRInserta(f, Func {level=newLevel {parent=topLevel (), name=tigertemp.newlabel (), formals = (List.map (fn p => !(#escape p)) ps)}, label=tigertemp.newlabel(), formals= (List.map (fn p => transTy(#typ p)) ps), result = solvetipo(r), extern=false}, env))
+					|add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = let val myLabel = tigertemp.newlabel () in add (fs, tabRInserta(f, Func {level=newLevel {parent=topLevel (), name=myLabel, formals = (List.map (fn p => !(#escape p)) ps)}, label= myLabel, formals= (List.map (fn p => transTy(#typ p)) ps), result = solvetipo(r), extern=false}, env)) end
 				
 				fun checkformals([],_) = ()
 					|checkformals ({name= n0, escape= b, typ= ty}::ps,i) = let fun inlist({name= n0, escape= _, typ= _}, []) = false
@@ -359,12 +358,15 @@ fun transExp(venv, tenv) =
 												in if inlist({name= n0, escape= b, typ= ty},ps) then error("Repeticion de formal "^n0,i) else checkformals(ps,i) end
 				
 				fun addformals(env, [],_) = env
-					|addformals(env, ({name= n, escape= b, typ= ty}::ps),i) = addformals(tabRInserta(n, mockVar (transTy (ty)) , env), ps,i)
+					|addformals(env, ({name= n, escape= b, typ= ty}::ps),i) = addformals(tabRInserta(n, mockVar (transTy (ty)) (!b) , env), ps,i)
 				
 				fun checkf([], env) = ()
 					|checkf((({name=f, params=ps, result=r, body=b}, i)::fs),env) = let val _ = checkformals(ps, i)
 														val {exp=e, ty=t} = transExp(addformals(env,ps,i), tenv) b
 														val _ = mychecktipo (solvetipo(r)) t i
+														val _ = let val (funLevel, isproc) = (case tabBusca (f, env) of
+																										SOME (Func {formals, extern, result, level, label}) => (level, result = TUnit)
+																										| _ => raise Fail "No deberia pasar") in functionDec (e,funLevel, isproc) end
 													in () end
 				fun addycheck (fs, env) = let val nenv = add(fs, env)
 								val _ = checkf(fs,nenv)
@@ -374,7 +376,7 @@ fun transExp(venv, tenv) =
 				let val retval = (addycheck(fs, venv), tenv, [])
 					val _ = postFunctionDec ()
 				in retval end
-			end (*COMPLETAR*)
+			end (*COMPLETAR, capaz que ya esta, cuando saquemos mockVar*)
 		| trdec (venv,tenv) (TypeDec ts) =
 			let 
 				fun adddep (({name=n, ty=NameTy t},_), l) = ((t,n)::l)
@@ -426,6 +428,6 @@ fun transExp(venv, tenv) =
 									result=SOME "int", body=SeqExp([ex, IntExp(0,0)],0)}, 0)]],
 							body=UnitExp 0}, 0)
 			val {exp = e, ty = tbody} = transExp(tab_vars, tab_tipos) main
-			val _ = print (tigertrans.ppEXP e)
+			val _ = print (Ir (getResult ()))
 		in	print "bien!\n" end
 	end

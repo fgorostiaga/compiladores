@@ -138,7 +138,7 @@ fun nilExp() = Ex (CONST 0)
 fun intExp i = Ex (CONST i)
 
 fun simpleVar(acc, nivel) =
-	Ex (CONST 9129310) (*COMPLETAR*)
+	Ex (exp acc (CONST 0)) (*COMPLETAR*)
 
 fun varDec(acc) = simpleVar(acc, getActualLev())
 
@@ -179,6 +179,7 @@ in
 end
 
 fun callExp (name,external,isproc,lev:level,ls) = 
+	if external then let val ex = (externalCall (name, map (fn x => unEx x) ls)) in (*if isproc then Nx ex else*) Ex ex end else
 	Ex (CONST 3211530) (*COMPLETAR*)
 
 fun letExp ([], body) = Ex (unEx body)
