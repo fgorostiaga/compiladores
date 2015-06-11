@@ -139,7 +139,7 @@ fun nilExp() = Ex (CONST 0)
 fun intExp i = Ex (CONST i)
 
 fun simpleVar(acc, nivel) =
-	Ex (exp acc (CONST 0)) (*COMPLETAR*)
+	Ex (exp acc (CONST 0)) (*COMPLETAR, quiza ya este...*)
 
 fun varDec(acc) = simpleVar(acc, getActualLev())
 
@@ -182,7 +182,7 @@ end
 fun callExp (name,external,isproc,lev:level,ls) = 
 	let val ex = if external then (externalCall (name, map (fn x => unEx x) ls)) else
 		(CALL (NAME name, map (fn x => unEx x) ls))
-	in (*if isproc then Nx ex else*) Ex ex end (*COMPLETAR*)
+	in (*if isproc then Nx ex else*) Ex ex end (*COMPLETAR, capaz que ya esta*)
 
 fun letExp ([], body) = Ex (unEx body)
  |  letExp (inits, body) = Ex (ESEQ(seq inits,unEx body))
@@ -229,7 +229,16 @@ fun forExp {lo, hi, var, body} =
 	Ex (CONST 0) (*COMPLETAR*)
 
 fun ifThenExp{test, then'} =
-	Ex (CONST 0) (*COMPLETAR*)
+	let
+		val cf = unCx test
+		val expthen = unNx then'
+		val (l0,l1) = (newlabel(), newlabel())
+	in
+		Nx (seq[cf(l0,l1),
+			LABEL l0,
+			expthen,
+			LABEL l1])
+	end (*COMPLETAR capaz que ya esta*)
 
 fun ifThenElseExp {test,then',else'} =
 	Ex (CONST 0) (*COMPLETAR*)
