@@ -1,0 +1,9 @@
+let 
+	var x : int := 4
+in
+	if x = 0 then (
+		print ("Hola");
+		x := x-1)
+	else
+		print ("Chau")
+end
