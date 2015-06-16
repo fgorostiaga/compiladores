@@ -284,7 +284,17 @@ in
 end
 
 fun binOpIntExp {left, oper, right} = 
-	Ex (CONST 0) (*COMPLETAR*)
+	let
+		val leftexp = unEx left
+		val rightexp = unEx right
+	in
+		case oper of
+			PlusOp => Ex (BINOP (PLUS,leftexp,rightexp))
+			| MinusOp => Ex (BINOP (MINUS,leftexp,rightexp))
+			| TimesOp => Ex (BINOP (MUL,leftexp,rightexp))
+			| DivideOp => Ex (BINOP (DIV,leftexp,rightexp))
+			|_ => raise Fail ("Error binopintexp")
+	end (*COMPLETAR capaz que ya esta*)
 
 fun binOpIntRelExp {left,oper,right} =
 	Ex (CONST 0) (*COMPLETAR*)
