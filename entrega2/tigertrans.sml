@@ -313,7 +313,13 @@ fun binOpIntRelExp {left,oper,right} =
 	(*COMPLETAR, capaz que ya esta*)
 
 fun binOpStrExp {left,oper,right} =
-	Ex (CONST 0) (*COMPLETAR*)
+	let
+		val leftexp = unEx left
+		val rightexp = unEx right
+		val res = Ex (externalCall("_stringCompare", [leftexp, rightexp]))
+	in
+		binOpIntRelExp {left=res, oper=oper, right=Ex (CONST 0)}
+	end (*COMPLETAR capaz ya esta*)
 
 fun ppEXP (Ex e) = "EX (" ^ (tigertree.ppEXP e) ^ ")"
 	| ppEXP (Nx s) = "NX (" ^ (tigertree.ppSTM s) ^ ")"
