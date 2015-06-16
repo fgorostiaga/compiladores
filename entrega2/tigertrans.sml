@@ -226,7 +226,21 @@ in
 end
 
 fun forExp {lo, hi, var, body} =
-	Ex (CONST 0) (*COMPLETAR*)
+let
+	val explo = unEx lo
+	val exphi = unEx hi
+	val expvar = unNx var
+	val expb = unNx body
+	val (l0,l1,l2) = (newlabel(), newlabel(), topSalida())
+in
+	Nx (seq[expvar,
+			LABEL l0,
+			CJUMP (EQ, explo, exphi, l1, l2),
+			LABEL l1,
+			expb,
+			JUMP(NAME l0, [l0]),
+			LABEL l2])
+end (*COMPLETAR, quizas ya este*)
 
 fun ifThenExp{test, then'} =
 	let
