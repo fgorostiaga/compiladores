@@ -241,7 +241,22 @@ fun ifThenExp{test, then'} =
 	end (*COMPLETAR capaz que ya esta*)
 
 fun ifThenElseExp {test,then',else'} =
-	Ex (CONST 0) (*COMPLETAR*)
+	let
+		val cf = unCx test
+		val expthen = unEx then'
+		val expelse = unEx else'
+		val (l0,l1,l2) = (newlabel(), newlabel(), newlabel())
+		val r = newtemp ()
+	in
+		Ex (ESEQ(seq[cf(l0,l1),
+			LABEL l0,
+			MOVE(TEMP r, expthen),
+			JUMP (NAME l2, [l2]),
+			LABEL l1,
+			MOVE(TEMP r, expelse),
+			LABEL l2],
+			TEMP r))
+	end (*COMPLETAR capaz que ya esta*)
 
 fun ifThenElseExpUnit {test,then',else'} =
 	Ex (CONST 0) (*COMPLETAR*)
