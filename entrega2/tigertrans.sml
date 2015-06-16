@@ -297,7 +297,20 @@ fun binOpIntExp {left, oper, right} =
 	end (*COMPLETAR capaz que ya esta*)
 
 fun binOpIntRelExp {left,oper,right} =
-	Ex (CONST 0) (*COMPLETAR*)
+	let
+		val leftexp = unEx left
+		val rightexp = unEx right
+	in
+		case oper of
+			EqOp => Cx (fn (t,f) => CJUMP (EQ, leftexp, rightexp, t, f))
+			| NeqOp => Cx (fn (t,f) => CJUMP (NE, leftexp, rightexp, t, f))
+			| LtOp => Cx (fn (t,f) => CJUMP (LT, leftexp, rightexp, t, f))
+			| LeOp => Cx (fn (t,f) => CJUMP (LE, leftexp, rightexp, t, f))
+			| GtOp => Cx (fn (t,f) => CJUMP (GT, leftexp, rightexp, t, f))
+			| GeOp => Cx (fn (t,f) => CJUMP (GE, leftexp, rightexp, t, f))
+			|_ => raise Fail ("Error binopintrelexp")
+	end
+	(*COMPLETAR, capaz que ya esta*)
 
 fun binOpStrExp {left,oper,right} =
 	Ex (CONST 0) (*COMPLETAR*)
