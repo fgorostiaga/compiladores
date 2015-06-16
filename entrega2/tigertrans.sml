@@ -259,7 +259,21 @@ fun ifThenElseExp {test,then',else'} =
 	end (*COMPLETAR capaz que ya esta*)
 
 fun ifThenElseExpUnit {test,then',else'} =
-	Ex (CONST 0) (*COMPLETAR*)
+	let
+		val cf = unCx test
+		val expthen = unNx then'
+		val expelse = unNx else'
+		val (l0,l1,l2) = (newlabel(), newlabel(), newlabel())
+	in
+		Nx (seq[cf(l0,l1),
+			LABEL l0,
+			expthen,
+			JUMP (NAME l2, [l2]),
+			LABEL l1,
+			expelse,
+			LABEL l2
+			])
+	end (*COMPLETAR capaz que ya esta*)
 
 fun assignExp{var, exp} =
 let
