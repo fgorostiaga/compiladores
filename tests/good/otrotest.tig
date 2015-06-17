@@ -1,0 +1,4 @@
+let type R = {a:string, b:int}
+var v:=R {a="Hola", b=10}
+function f(x:int):int=v.b+x
+in f(343) end
