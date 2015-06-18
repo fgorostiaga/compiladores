@@ -139,7 +139,10 @@ fun nilExp() = Ex (CONST 0)
 fun intExp i = Ex (CONST i)
 
 fun simpleVar(acc, nivel) =
-	Ex (exp acc (CONST 0)) (*COMPLETAR, quiza ya este... la funcion exp ignora el segundo argumento (cualquiiera)*)
+	let val _ = print ("actualLev - nivel = "^Int.toString (getActualLev()-nivel))
+	in
+		Ex (exp acc (CONST 0)) (*COMPLETAR, quiza ya este... la funcion exp ignora el segundo argumento (cualquiiera). edit: no esta. 'Anda' solo si nivel = getActualLevl ()*)
+	end
 
 fun varDec(acc) = simpleVar(acc, getActualLev())
 

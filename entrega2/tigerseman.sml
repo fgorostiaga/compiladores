@@ -372,8 +372,9 @@ fun transExp(venv, tenv) =
 																										SOME (Func {formals, extern, result, level, label}) => (level, result = TUnit)
 																										| _ => raise Fail "No deberia pasar")
 																	val _ = checkf (fs,env)
+																	val newvenv = addformals(env,ps,i)
 																	val _ = pushLevel funLevel
-																	val {exp=e, ty=t} = transExp(addformals(env,ps,i), tenv) b
+																	val {exp=e, ty=t} = transExp(newvenv, tenv) b
 																	val _ = popLevel ()
 																	val _ = mychecktipo (solvetipo(r)) t i
 																in functionDec (e,funLevel, isproc) end
