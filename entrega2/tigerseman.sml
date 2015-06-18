@@ -368,13 +368,15 @@ fun transExp(venv, tenv) =
 				
 				fun checkf([], env) = ()
 					|checkf((({name=f, params=ps, result=r, body=b}, i)::fs),env) = let val _ = checkformals(ps, i)
-														val {exp=e, ty=t} = transExp(addformals(env,ps,i), tenv) b
-														val _ = mychecktipo (solvetipo(r)) t i
 														val _ = let val (funLevel, isproc) = (case tabBusca (f, env) of
 																										SOME (Func {formals, extern, result, level, label}) => (level, result = TUnit)
 																										| _ => raise Fail "No deberia pasar")
-														val _ = checkf (fs,env)
-														in functionDec (e,funLevel, isproc) end
+																	val _ = checkf (fs,env)
+																	val _ = pushLevel funLevel
+																	val {exp=e, ty=t} = transExp(addformals(env,ps,i), tenv) b
+																	val _ = popLevel ()
+																	val _ = mychecktipo (solvetipo(r)) t i
+																in functionDec (e,funLevel, isproc) end
 													in () end
 				fun addycheck (fs, env) = let val nenv = add(fs, env)
 								val _ = checkf(fs,nenv)
