@@ -190,7 +190,7 @@ end
 
 fun callExp (name,external,isproc,lev:level,ls) = 
 	let val ex = if external then (externalCall (name, map (fn x => unEx x) ls)) else
-		(CALL (NAME name, map (fn x => unEx x) ls))
+		(CALL (NAME name, TEMP(fp) :: map (fn x => unEx x) ls))
 	in (*if isproc then Nx ex else*) Ex ex end (*COMPLETAR, capaz que ya esta*)
 
 fun letExp ([], body) = Ex (unEx body)
