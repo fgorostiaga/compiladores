@@ -139,9 +139,15 @@ fun nilExp() = Ex (CONST 0)
 fun intExp i = Ex (CONST i)
 
 fun simpleVar(acc, nivel) =
-	let val _ = print ("actualLev - nivel = "^Int.toString (getActualLev()-nivel))
+	let
+		fun jumper 0 = TEMP fp
+			|jumper n = MEM (jumper (n-1))
+		fun myexp (InReg l) _ = TEMP l
+			|myexp (InFrame k) n = MEM(BINOP(PLUS, jumper n, CONST k))
+		val levDif = getActualLev () - nivel
+		val _ = print ("actualLev - nivel = "^Int.toString (levDif))
 	in
-		Ex (exp acc (CONST 0)) (*COMPLETAR, quiza ya este... la funcion exp ignora el segundo argumento (cualquiiera). edit: no esta. 'Anda' solo si nivel = getActualLevl ()*)
+		Ex (myexp acc levDif) (*COMPLETAR, quiza ya este*)
 	end
 
 fun varDec(acc) = simpleVar(acc, getActualLev())
