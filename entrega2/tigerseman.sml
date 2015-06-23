@@ -431,7 +431,7 @@ fun transExp(venv, tenv) =
 					|addtotenv([],tenv)=tenv
 
 			in
-				(venv, addtotenv(ts, addtotenvnone(ts,tenv)), []) end (*COMPLETAR*)
+				(venv, addtotenv(ts, addtotenvnone(ts,tenv)), []) end (*COMPLETAR, capaz que ya esta, ppponele*)
 		in trexp end
 	fun transProg ex =
 		let	val main =
