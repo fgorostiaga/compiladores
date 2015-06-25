@@ -439,6 +439,8 @@ fun transExp(venv, tenv) =
 									result=SOME "int", body=SeqExp([ex, IntExp(0,0)],0)}, 0)]],
 							body=UnitExp 0}, 0)
 			val {exp = e, ty = tbody} = transExp(tab_vars, tab_tipos) main
-			val _ = print (Ir (getResult ()))
+			(*val _ = print (Ir (getResult ()))*)
+			val frags = List.map canonizeFrag (getResult ())
+			val _ = List.map print (List.map Ir (frags))
 		in	print "bien!\n" end
 	end

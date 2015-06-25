@@ -4,6 +4,7 @@ open tigerframe
 open tigertree
 open tigertemp
 open tigerabs
+open tigercanon
 
 exception breakexc
 exception divCero
@@ -72,6 +73,9 @@ fun unCx (Nx s) = raise Fail ("Error (UnCx(Nx..))")
 	(fn (t,f) => JUMP(NAME t, [t]))
 	| unCx (Ex e) =
 	(fn (t,f) => CJUMP(NE, e, CONST 0, t, f))
+
+fun canonizeFrag (PROC{body, frame}) = List.map (fn stm=> PROC {body=stm, frame=frame}) (traceSchedule (basicBlocks(linearize body)))
+	| canonizeFrag x = [x]
 
 fun Ir(e) =
 	let	fun aux(Ex e) = tigerit.tree(EXP e)

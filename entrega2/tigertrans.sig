@@ -48,5 +48,6 @@ val arrayExp : {size: exp, init: exp} -> exp
 val ppEXP : exp -> string
 
 val Ir : frag list -> string
+val canonizeFrag: frag -> frag list
 
 end
