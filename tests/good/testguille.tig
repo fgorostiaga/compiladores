@@ -1,0 +1,13 @@
+let function f(a:int,b:int):int =
+	let function g(c:int):int =
+		let function h(d:int):int =
+			let function j(e:int):int =
+				e+d+c+a+b+g(c-1)
+			in (2*j(d+8))
+			end
+		in h(c*2)
+		end
+	in g(a+b)
+	end
+in f(9,5)
+end

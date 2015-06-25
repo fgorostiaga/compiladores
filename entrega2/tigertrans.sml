@@ -138,10 +138,11 @@ fun nilExp() = Ex (CONST 0)
 
 fun intExp i = Ex (CONST i)
 
+fun jumper 0 = TEMP fp
+	|jumper n = MEM (jumper (n-1)) (*home made*)
+
 fun simpleVar(acc, nivel) =
 	let
-		fun jumper 0 = TEMP fp
-			|jumper n = MEM (jumper (n-1))
 		fun myexp (InReg l) _ = TEMP l
 			|myexp (InFrame k) n = MEM(BINOP(PLUS, jumper n, CONST k))
 		val levDif = getActualLev () - nivel
@@ -190,7 +191,10 @@ end
 
 fun callExp (name,external,isproc,lev:level,ls) = 
 	let val ex = if external then (externalCall (name, map (fn x => unEx x) ls)) else
-		(CALL (NAME name, TEMP(fp) :: map (fn x => unEx x) ls))
+		let val jump = getActualLev () - #level lev + 1
+		in
+			(CALL (NAME name, (jumper jump) :: map (fn x => unEx x) ls))
+		end
 	in (*if isproc then Nx ex else*) Ex ex end (*COMPLETAR, capaz que ya esta*)
 
 fun letExp ([], body) = Ex (unEx body)
