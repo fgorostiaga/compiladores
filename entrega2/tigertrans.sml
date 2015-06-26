@@ -150,7 +150,6 @@ fun simpleVar(acc, nivel) =
 		fun myexp (InReg l) _ = TEMP l
 			|myexp (InFrame k) n = MEM(BINOP(PLUS, jumper n, CONST k))
 		val levDif = getActualLev () - nivel
-		val _ = print ("actualLev - nivel = "^Int.toString (levDif))
 	in
 		Ex (myexp acc levDif) (*COMPLETAR, quiza ya este*)
 	end

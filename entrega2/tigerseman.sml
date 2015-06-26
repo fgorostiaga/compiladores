@@ -325,8 +325,12 @@ fun transExp(venv, tenv) =
 				fun gettype(init) = let val {exp=e, ty=ti} = transExp(venv, tenv) init
 									in (case ti of TNil => raise Fail "Nil not constrained"
 													| t => (t,e)) end
-			in let val (ty,ex) = (gettype (init)) in
-					(tabRInserta (name, mockVar ty (!escape), venv), tenv, [ex])
+			in let val (ty,ex) = (gettype (init)) 
+					val access = allocLocal (topLevel ()) (!escape)
+					val level = getActualLev ()
+					val moc = Var {ty = ty, access = access, level=level}
+					val exp = assignExp {var=simpleVar (access, level),exp=ex} in
+					(tabRInserta (name, moc, venv), tenv, [exp])
 				end 
 			end (*COMPLETAR, capaz que ya esta*)
 		| trdec (venv,tenv) (VarDec ({name,escape,typ=SOME s,init},pos)) =
@@ -336,8 +340,12 @@ fun transExp(venv, tenv) =
 								val {exp=e, ty=td} = transExp(venv, tenv) init
 								val _ = mychecktipo ti td pos
 							in (ti,e) end
-			in let val (ty,ex) = (gettype (s, init)) in
-					(tabRInserta (name, mockVar ty (!escape), venv), tenv, [ex])
+			in let val (ty,ex) = (gettype (s, init))
+					val access = allocLocal (topLevel ()) (!escape)
+					val level = getActualLev ()
+					val moc = Var {ty = ty, access = access, level=level}
+					val exp = assignExp {var=simpleVar (access, level),exp=ex} in
+					(tabRInserta (name, moc, venv), tenv, [exp])
 				end 
 			end (*COMPLETAR, capaz que ya esta*)
 		| trdec (venv,tenv) (FunctionDec fs) =
