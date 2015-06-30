@@ -213,7 +213,8 @@ struct
 		let
 			val str = TextIO.inputLine TextIO.stdIn
 		in
-			storeString str
+			(case str of SOME s => storeString s
+						|NONE => raise Fail "No deberia pasar")
 		end
 
 		val tabLib: (tigertemp.label, int list -> int) Tabla =

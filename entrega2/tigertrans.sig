@@ -49,5 +49,6 @@ val ppEXP : exp -> string
 
 val Ir : frag list -> string
 val canonizeFrag: frag -> frag list
+val otroCanonizeFrag: frag list -> (tigertree.stm list * tigerframe.frame) list * (tigertemp.label * string) list
 
 end

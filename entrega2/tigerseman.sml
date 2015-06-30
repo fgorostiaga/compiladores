@@ -358,7 +358,7 @@ fun transExp(venv, tenv) =
 				val _ = checkrep (List.map (fn (a,b)=> #name(a)) fs) "funciones"
 				
 				fun add ([],env) = env
-					|add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = let val myLabel = tigertemp.newlabel ()
+					|add ((({name=f, params=ps, result=r, body=b}, i)::fs),env) = let val myLabel = if f = "_tigermain" then "_tigermain" else tigertemp.newlabel ()
 						val _ = print ("LABEL FOR "^f^": "^myLabel^"\n")
 						in add (fs, tabRInserta(f, Func {level=newLevel {parent=topLevel (), name=myLabel, formals = (List.map (fn p => !(#escape p)) ps)}, label= myLabel, formals= (List.map (fn p => transTy(#typ p)) ps), result = solvetipo(r), extern=false}, env)) end
 				
@@ -449,6 +449,8 @@ fun transExp(venv, tenv) =
 			val {exp = e, ty = tbody} = transExp(tab_vars, tab_tipos) main
 			(*val _ = print (Ir (getResult ()))*)
 			val frags = List.map canonizeFrag (getResult ())
-			val _ = List.map print (List.map Ir (frags))
+			(*val _ = List.map print (List.map Ir (frags))*)
+			val (a,b) = otroCanonizeFrag (getResult ())
+			val _ = tigerinterp.inter true a b
 		in	print "bien!\n" end
 	end

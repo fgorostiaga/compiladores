@@ -77,6 +77,15 @@ fun unCx (Nx s) = raise Fail ("Error (UnCx(Nx..))")
 fun canonizeFrag (PROC{body, frame}) = List.map (fn stm=> PROC {body=stm, frame=frame}) (traceSchedule (basicBlocks(linearize body)))
 	| canonizeFrag x = [x]
 
+fun otroCanonizeFrag xs =
+	let fun router xs ys [] = (xs,ys)
+			|router xs ys (PROC x :: mas) = canonizeFragProc xs ys (PROC x :: mas)
+			|router xs ys (STRING (a,b) :: mas) = router xs ((a,b) :: ys) mas
+		and canonizeFragProc xs ys (PROC {body, frame} :: mas) = router (((traceSchedule (basicBlocks (linearize body))),frame)::xs) ys mas
+			|canonizeFragProc _ _ _ = raise Fail "No deberia pasar"
+	in router [] [] xs
+	end
+
 fun Ir(e) =
 	let	fun aux(Ex e) = tigerit.tree(EXP e)
 		| aux(Nx s) = tigerit.tree(s)
