@@ -5,6 +5,8 @@ open tigertree
 open tigertemp
 open tigerabs
 open tigercanon
+open Listsort
+(*load "Listsort"*)
 
 exception breakexc
 exception divCero
@@ -85,6 +87,7 @@ fun otroCanonizeFrag xs =
 			|canonizeFragProc _ _ _ = raise Fail "No deberia pasar"
 	in router [] [] xs
 	end
+(*Grande Felii*)
 
 fun Ir(e) =
 	let	fun aux(Ex e) = tigerit.tree(EXP e)
@@ -188,6 +191,13 @@ end
 fun recordExp ls =
 	let
 		val cuantos = CONST (length ls)
+	(*	fun sort [] = []
+                   |sort [x] = [x]
+                   |sort (x::xs) = let val (x1,x2) = List.partition (fn a => (#name a)<(#name x)) xs
+                   in (sort x1 @ (x::sort x2)) end
+                val ls_s = sort ls
+		val ls_ordenada = Listsort.sort (fn ((_,m),(_,n)) => Int.compare (m,n)) ls *)
+		(*lo que intento hacer es ordenar los argumentos del record para que se pueda declarar una variable con los argumentos intercambiados llamados por sus nombres, ver barufatest.sig *)
 		val exps = map (fn (exp, _) => unEx exp) ls
 	in
 	Ex (externalCall("_allocRecord", cuantos::exps))

@@ -1,0 +1,7 @@
+let 
+	type R={a:int,b:int}
+	function f():int = (print ("uno\n");10)
+	function g():int = (print ("dos\n");20)
+	var r:=R {b=f(),a=g()}
+in 0 end
+
