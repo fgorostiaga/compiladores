@@ -46,6 +46,7 @@ val binOpIntRelExp: {left:exp, oper:tigerabs.oper, right:exp} -> exp
 val binOpStrExp : {left:exp, oper:tigerabs.oper, right:exp} -> exp
 val arrayExp : {size: exp, init: exp} -> exp
 val ppEXP : exp -> string
+val deref : exp -> exp
 
 val Ir : frag list -> string
 val canonizeFrag: frag -> frag list

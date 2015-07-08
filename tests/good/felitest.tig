@@ -1,5 +1,6 @@
 let 
 	var x : int := 4
+	var y : int := x
 in
 	if x = 0 then (
 		print ("Hola");

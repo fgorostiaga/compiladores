@@ -154,6 +154,9 @@ fun nilExp() = Ex (CONST 0)
 
 fun intExp i = Ex (CONST i)
 
+fun deref (Ex ex) = Ex (MEM ex)
+	|deref _ = raise Fail "No deberia pasar" (*home made*)
+
 fun jumper 0 = TEMP fp
 	|jumper n = MEM (jumper (n-1)) (*home made*)
 
