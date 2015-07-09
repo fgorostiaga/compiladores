@@ -154,9 +154,6 @@ fun nilExp() = Ex (CONST 0)
 
 fun intExp i = Ex (CONST i)
 
-fun deref (Ex ex) = Ex (MEM ex)
-	|deref _ = raise Fail "No deberia pasar" (*home made*)
-
 fun jumper 0 = TEMP fp
 	|jumper n = MEM (jumper (n-1)) (*home made*)
 
@@ -173,8 +170,8 @@ fun varDec(acc) = simpleVar(acc, getActualLev())
 
 fun fieldVar(var, fieldindex) = 
 	let val varEx = unEx var in
-		Ex (BINOP (PLUS, varEx,
-					BINOP(MUL, CONST fieldindex, CONST tigerframe.wSz)))
+		Ex (MEM (BINOP (PLUS, varEx,
+					BINOP(MUL, CONST fieldindex, CONST tigerframe.wSz))))
 	end (*COMPLETAR capaz que ya esta*)
 
 fun subscriptVar(arr, ind) =
@@ -186,7 +183,7 @@ let
 in
 	Ex( ESEQ(seq[MOVE(TEMP ra, a),
 		MOVE(TEMP ri, i),
-		EXP(externalCall("_checkindex", [TEMP ra, TEMP ri]))],
+		EXP(externalCall("_checkIndexArray", [TEMP ra, TEMP ri]))],
 		MEM(BINOP(PLUS, TEMP ra,
 			BINOP(MUL, TEMP ri, CONST tigerframe.wSz)))))
 end
@@ -267,15 +264,18 @@ fun forExp {lo, hi, var, body} =
 let
 	val explo = unEx lo
 	val exphi = unEx hi
-	val expvar = unNx var
+	val expvarinit = unNx var
+	val expvaraccess = (case expvarinit of (MOVE (dest,_)) => dest
+											| _ => raise Fail "No deberia pasar")
 	val expb = unNx body
 	val (l0,l1,l2) = (newlabel(), newlabel(), topSalida())
 in
-	Nx (seq[expvar,
+	Nx (seq[expvarinit,
 			LABEL l0,
-			CJUMP (EQ, explo, exphi, l1, l2),
+			CJUMP (EQ, expvaraccess, exphi, l2, l1),
 			LABEL l1,
 			expb,
+			MOVE(expvaraccess, (BINOP (PLUS,expvaraccess,CONST 1))),
 			JUMP(NAME l0, [l0]),
 			LABEL l2])
 end (*COMPLETAR, quizas ya este*)

@@ -102,12 +102,7 @@ fun transExp(venv, tenv) =
 
 	let
 		fun solvety (ty, tenv) = if tabEsta(ty, tenv) then (tabSaca(ty, tenv)) else raise Fail "Error de tipos. Tipo inexistente en la tabla"
-		fun trexp(VarExp v) =
-			let
-				val {exp = e0, ty=ti} = trvar v
-			in {exp = (case ti of TInt _ => deref e0
-						| _ => e0), ty = ti}
-			end
+		fun trexp(VarExp v) = trvar v
 		| trexp(UnitExp _) = {exp=unitExp(), ty=TUnit}
 		| trexp(NilExp _)= {exp=nilExp(), ty=TNil}
 		| trexp(IntExp(i, _)) = {exp=intExp i, ty=TInt RW}

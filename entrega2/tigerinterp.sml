@@ -100,17 +100,17 @@ struct
 		(* Funciones de biblioteca *)
 		fun initArray(siz::init::rest) =
 		let
-			val mem = getNewMem(siz)
-			val l = (mem+1, siz)::(List.tabulate(siz, (fn x => (mem+tigerframe.wSz*x, init))))
+			val mem = getNewMem(siz+1)
+			val l = (mem, siz)::(List.tabulate(siz, (fn x => (1+mem+tigerframe.wSz*x, init))))
 			val _ = List.map (fn (a,v) => storeMem a v) l
 		in
-			mem
+			mem+1
 		end
 		| initArray _ = raise Fail("No debería pasar (initArray)")
 
 		fun checkIndexArray(arr::idx::rest) =
 		let
-			val siz = loadMem (arr+1)
+			val siz = loadMem (arr-1)
 			val _ = if (idx>=siz orelse idx<0) then raise Fail("Índice fuara de rango\n") else ()
 		in
 			0
@@ -353,7 +353,7 @@ struct
 				val _ = map (fn (x,y) => 
 					case x of
 						TEMP t => storeTemp t y
-						| MEM m => storeMem (evalExp m) y) formalsValues
+						| MEM m => (print ("STORING INTO MEM CELL "^Int.toString(evalExp m)^", THE NUMBER: "^Int.toString(y)^"\n");storeMem (evalExp m) y)) formalsValues
 				(* Ejecutar la lista de instrucciones *)
 				val _ = execute body
 				val rv = loadTemp tigerframe.rv
