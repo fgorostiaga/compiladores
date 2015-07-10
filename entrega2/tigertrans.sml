@@ -383,6 +383,6 @@ fun allocArgExpression (access, argNumber) =
 	in assignExp {var=expVar, exp=expSrc}
 	end
 
-val allocFirstArgExpression = allocArgExpression(InReg fp, 0)
+val allocFirstArgExpression = allocArgExpression(InFrame 0, 0)
 
 end
