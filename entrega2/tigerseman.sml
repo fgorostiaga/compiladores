@@ -366,12 +366,16 @@ fun transExp(venv, tenv) =
 													|inlist({name= n0, escape= b, typ= t}, ({name= n1, escape= _, typ= _}::xs)) = if n0=n1 then true else inlist({name= n0, escape= b, typ= t}, xs)
 												in if inlist({name= n0, escape= b, typ= ty},ps) then error("Repeticion de formal "^n0,i) else checkformals(ps,i) end
 				
-				fun addformals(env, [],_) = env
-					|addformals(env, ({name= n, escape= b, typ= ty}::ps),i) = let
-						val theVar = Var {ty = (transTy (ty)), access = allocArg (topLevel ()) (!b), level=(getActualLev ())}
-						in
-							addformals(tabRInserta(n, theVar, env), ps,i)
-						end
+				fun addformals (env, ps) = 
+					let fun aux(env, [],exps) = (env,exps)
+							|aux(env, ({name= n, escape= b, typ= ty}::ps),exps) = let
+								val access = allocArg (topLevel ()) (!b)
+								val theVar = Var {ty = (transTy (ty)), access = access, level=(getActualLev ())}
+								val theAssignExp = allocArgExpression (access, List.length(exps))
+								in aux(tabRInserta(n, theVar, env), ps, exps@[theAssignExp])
+								end
+					in aux(env, ps, [allocFirstArgExpression])
+					end
 				
 				fun checkf([], env) = ()
 					|checkf((({name=f, params=ps, result=r, body=b}, i)::fs),env) = let val _ = checkformals(ps, i)
@@ -379,12 +383,13 @@ fun transExp(venv, tenv) =
 																										SOME (Func {formals, extern, result, level, label}) => (level, result = TUnit)
 																										| _ => raise Fail "No deberia pasar")
 																	val _ = checkf (fs,env)
-																	val newvenv = addformals(env,ps,i)
+																	val (newvenv,initArgsExps) = addformals(env,ps)
 																	val _ = pushLevel funLevel
-																	val {exp=e, ty=t} = transExp(newvenv, tenv) b
+																	val {exp=expbody, ty=t} = transExp(newvenv, tenv) b
+																	val expArgsAndBody = seqExp(initArgsExps@[expbody])
 																	val _ = popLevel ()
 																	val _ = mychecktipo (solvetipo(r)) t i
-																in functionDec (e,funLevel, isproc) end
+																in functionDec (expArgsAndBody,funLevel, isproc) end
 													in () end
 				fun addycheck (fs, env) = let val nenv = add(fs, env)
 								val _ = checkf(fs,nenv)

@@ -348,7 +348,7 @@ struct
 				val fpPrev = loadTemp tigerframe.fp
 				val _ = storeTemp tigerframe.fp (fpPrev-1024*1024)
 				(* Poner argumentos donde la función los espera *)
-				val formals = map (fn x => tigerframe.exp x (TEMP tigerframe.fp)) (tigerframe.formals frame)
+				val formals = map (fn x => tigerframe.exp x ) (tigerframe.formals frame)
 				val formalsValues = ListPair.zip(formals, args)
 				val _ = map (fn (x,y) => 
 					case x of

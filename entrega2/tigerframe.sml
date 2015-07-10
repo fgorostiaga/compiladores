@@ -37,7 +37,7 @@ val localsInicial = 0		(* words *)
 val localsGap = ~1 			(* bytes *)
 val calldefs = [rv]
 val specialregs = [rv, fp, sp]
-val argregs = []
+val argregs = ["ARG1","ARG2", "ARG3"] (*Feli was here*)
 val callersaves = []
 val calleesaves = []
 
@@ -63,13 +63,23 @@ fun newFrame{name, formals} = {
 }
 fun name(f: frame) = #name f
 fun string(l, s) = l^tigertemp.makeString(s)^"\n"
+val argregslength = List.length(argregs)
+fun getArgForPos n = if (n<argregslength) then
+						InReg (List.nth(argregs,n)) else
+						InFrame ((n-argregslength)*wSz+argsGap)
+
 fun formals({formals=f, ...}: frame) = 
+	List.tabulate (List.length(f)+1, getArgForPos) (*+1 por el FP*)
+
+fun formals_ORI({formals=f, ...}: frame) = 
 	let	fun aux(n, []) = []
 		| aux(n, h::t) = InFrame(n)::aux(n+argsGap, t)
 	in aux(argsInicial, (true :: f)) end
+
+
 fun maxRegFrame(f: frame) = !(#actualReg f)
 fun allocArg (f: frame) b = 
-	case true of
+	case b of
 	true =>
 		let	val ret = (!(#actualArg f)+argsOffInicial)*wSz
 			val _ = #actualArg f := !(#actualArg f)+1
@@ -81,8 +91,8 @@ fun allocLocal (f: frame) b =
 		let	val ret = InFrame((!(#actualLocal f)+localsGap)*wSz)
 		in	#actualLocal f:=(!(#actualLocal f)-1); ret end
 	| false => InReg(tigertemp.newtemp())
-fun exp(InFrame k) e = MEM(BINOP(PLUS, TEMP(fp), CONST k)) (*Deberia usar el e?*)
-| exp(InReg l) _ = TEMP l
+fun exp(InFrame k) = MEM(BINOP(PLUS, TEMP(fp), CONST k)) (*Deberia usar el e?*)
+| exp(InReg l) = TEMP l
 fun externalCall(s, l) = CALL(NAME s, l)
 
 fun procEntryExit1 (frame,body) = body
