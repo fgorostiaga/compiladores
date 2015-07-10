@@ -34,7 +34,7 @@ val argsOffInicial = 1		(* words *)
 val argsGap = wSz			(* bytes *)
 val regInicial = 1			(* reg *)
 val localsInicial = 0		(* words *)
-val localsGap = ~4 			(* bytes *)
+val localsGap = ~1 			(* bytes *)
 val calldefs = [rv]
 val specialregs = [rv, fp, sp]
 val argregs = []
@@ -78,7 +78,7 @@ fun allocArg (f: frame) b =
 fun allocLocal (f: frame) b = 
 	case b of
 	true =>
-		let	val ret = InFrame(!(#actualLocal f)+localsGap)
+		let	val ret = InFrame((!(#actualLocal f)+localsGap)*wSz)
 		in	#actualLocal f:=(!(#actualLocal f)-1); ret end
 	| false => InReg(tigertemp.newtemp())
 fun exp(InFrame k) e = MEM(BINOP(PLUS, TEMP(fp), CONST k)) (*Deberia usar el e?*)

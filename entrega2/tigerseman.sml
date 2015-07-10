@@ -89,7 +89,6 @@ fun tiposIguales (TRecord _) TNil = true
 	| tiposIguales (TInt _) (TInt _) = true
 	| tiposIguales a b = (a=b)
 
-fun mockVar ty escap = Var {ty = ty, access = allocLocal (topLevel ()) escap, level=(getActualLev ())}
 
 fun isInt (TInt _) = true
 	| isInt _ = false
