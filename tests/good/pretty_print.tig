@@ -23,5 +23,8 @@ let
         end
     in show (0, tree); output
     end
-in 0
+	var lefttree:=tree {key= "left", left= nil, right= nil}
+	var righttree:=tree {key= "right", left= nil, right= nil}
+	var mytree:=tree {key= "awanta", left= lefttree, right= righttree}
+in print(prettyprint(mytree))
 end

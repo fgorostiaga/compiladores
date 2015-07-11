@@ -95,7 +95,7 @@ struct
 					(update(stringArray, idx, str); storeMem addr idx; addr)
 				end
 		end
-		val _ = List.map (fn (lab, str) => storeLabel lab (storeString str)) stringfracs
+		val _ = List.map (fn (lab, str) => (print ("("^lab^","^str^")");storeLabel lab (storeString str))) stringfracs
 
 		(* Funciones de biblioteca *)
 		fun initArray(siz::init::rest) =
@@ -211,9 +211,9 @@ struct
 
 		fun getstrFun(args) = 
 		let
-			val str = TextIO.inputLine TextIO.stdIn
+			val str = TextIO.input1 TextIO.stdIn
 		in
-			(case str of SOME s => storeString s
+			(case str of SOME s => storeString (Char.toString(s))
 						|NONE => raise Fail "No deberia pasar")
 		end
 
@@ -223,7 +223,7 @@ struct
 				("_checkIndexArray", checkIndexArray),
 				("_allocRecord", allocRecord),
 				("_checkNil", checkNil),
-				("_stringcmp", stringCompare),
+				("_stringCompare", stringCompare),
 				("print", printFun),
 				("flush", flushFun),
 				("ord", ordFun),
@@ -353,7 +353,8 @@ struct
 				val _ = map (fn (x,y) => 
 					case x of
 						TEMP t => storeTemp t y
-						| MEM m => (print ("STORING INTO MEM CELL "^Int.toString(evalExp m)^", THE NUMBER: "^Int.toString(y)^"\n");storeMem (evalExp m) y)) formalsValues
+						| MEM m => (print ("STORING INTO MEM CELL "^Int.toString(evalExp m)^", THE NUMBER: "^Int.toString(y)^"\n");storeMem (evalExp m) y)
+						| _ => raise Fail "No deberia pasar") formalsValues
 				(* Ejecutar la lista de instrucciones *)
 				val _ = execute body
 				val rv = loadTemp tigerframe.rv

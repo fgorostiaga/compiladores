@@ -82,7 +82,7 @@ fun canonizeFrag (PROC{body, frame}) = List.map (fn stm=> PROC {body=stm, frame=
 fun otroCanonizeFrag xs =
 	let fun router xs ys [] = (xs,ys)
 			|router xs ys (PROC x :: mas) = canonizeFragProc xs ys (PROC x :: mas)
-			|router xs ys (STRING (a,b) :: mas) = router xs ((a,b) :: ys) mas
+			|router xs ys (STRING (a,b) :: mas) = (print ("ADDING ("^a^","^b^")");router xs ((a,b) :: ys) mas)
 		and canonizeFragProc xs ys (PROC {body, frame} :: mas) = router (((traceSchedule (basicBlocks (linearize body))),frame)::xs) ys mas
 			|canonizeFragProc _ _ _ = raise Fail "No deberia pasar"
 	in router [] [] xs
@@ -133,7 +133,8 @@ fun stringExp(s: string) =
 	let	val l = newlabel()
 		val len = ".long "^makestring(stringLen s)
 		val str = ".string \""^s^"\""
-		val _ = datosGlobs:=(!datosGlobs @ [STRING(l, len), STRING("", str)])
+		(*val _ = datosGlobs:=(!datosGlobs @ [STRING(l, len), STRING("", str)]) No se para que lo hacen asi, pero no anda y no mekb*)
+		val _ = datosGlobs:=(!datosGlobs @ [STRING(l, s)])
 	in	Ex(NAME l) end
 fun preFunctionDec() =
 	(pushSalida(NONE);
@@ -272,7 +273,7 @@ let
 in
 	Nx (seq[expvarinit,
 			LABEL l0,
-			CJUMP (EQ, expvaraccess, exphi, l2, l1),
+			CJUMP (GT, expvaraccess, exphi, l2, l1),
 			LABEL l1,
 			expb,
 			MOVE(expvaraccess, (BINOP (PLUS,expvaraccess,CONST 1))),

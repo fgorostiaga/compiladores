@@ -120,7 +120,7 @@ fun transExp(venv, tenv) =
 					let val {exp = ae', ty=at'} = trexp a
 						val _ = mychecktipo t at' nl
 					in aux tt aa r@[{exp=ae', ty=at'}] end
-				val leargs = aux TArgs args []
+				val leargs = List.rev(aux TArgs args [])
 				val leargs' = map (fn {exp, ty} => exp) leargs
 				val pf = TRet = TUnit
 			in {exp=callExp (lab, ext, pf, lev, leargs'), ty=TRet} end (*COMPLETAR pponele que ya esta*)
@@ -457,6 +457,6 @@ fun transExp(venv, tenv) =
 			val _ = List.map print (List.map Ir (frags))
 			val _ = print "----------------\n"
 			val (a,b) = otroCanonizeFrag (getResult ())
-			val _ = tigerinterp.inter true a b
+			val _ = tigerinterp.inter false a b
 		in	print "bien!\n" end
 	end
