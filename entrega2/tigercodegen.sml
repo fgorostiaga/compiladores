@@ -23,6 +23,88 @@ let val ilist = ref (nil: A.instr list)
 			  dst = [i],
 			  src = [],
 			  jump = NONE})
+	|   munchStm(EXP(e)) = 
+		emit(OPER{assem = "MOV 'd0, s0 \n"
+			  dst = [Temp.newtemp()],
+			  src = [munchExp(e)],
+			  jump = NONE})
+	|   munchStm(JUMP(e,lls)) =	
+		emit(OPER{assem = "JMP 'd0 \n"
+			  dst = [munchExp(e)],
+			  src = [],
+			  jump = lls})
+	|   munchStm(CJUMP(EQ,e1,e2,l1,l2)) =	
+		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
+				  ^ " JE 'd0 \n",
+			  dst = [munchExp(e1),munchExp(e2)],
+			  src = [],
+			  jump = [l1,l2]})
+	|   munchStm(CJUMP(NE,e1,e2,l1,l2)) =	
+		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
+				  ^ " JNE 'd0 \n",
+			  dst = [munchExp(e1),munchExp(e2)],
+			  src = [],
+			  jump = [l1,l2]})
+	|   munchStm(CJUMP(LT,e1,e2,l1,l2)) =	
+		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
+				  ^ " JL 'd0 \n",
+			  dst = [munchExp(e1),munchExp(e2)],
+			  src = [],
+			  jump = [l1,l2]})
+
+	|   munchStm(CJUMP(GT,e1,e2,l1,l2)) =	
+		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
+				  ^ " JG 'd0 \n",
+			  dst = [munchExp(e1),munchExp(e2)],
+			  src = [],
+			  jump = [l1,l2]})
+
+	|   munchStm(CJUMP(LE,e1,e2,l1,l2)) =	
+		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
+				  ^ " JLE 'd0 \n",
+			  dst = [munchExp(e1),munchExp(e2)],
+			  src = [],
+			  jump = [l1,l2]})
+	|   munchStm(CJUMP(GE,e1,e2,l1,l2)) =	
+		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
+				  ^ " JGE 'd0 \n",
+			  dst = [munchExp(e1),munchExp(e2)],
+			  src = [],
+			  jump = [l1,l2]})
+	|   munchStm(CJUMP(ULT,e1,e2,l1,l2)) =	
+		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
+				  ^ " JB 'd0 \n",
+			  dst = [munchExp(e1),munchExp(e2)],
+			  src = [],
+			  jump = [l1,l2]})
+	|   munchStm(CJUMP(ULE,e1,e2,l1,l2)) =	
+		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
+				  ^ " JBE 'd0 \n",
+			  dst = [munchExp(e1),munchExp(e2)],
+			  src = [],
+			  jump = [l1,l2]})
+	|   munchStm(CJUMP(UGT,e1,e2,l1,l2)) =	
+		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
+				  ^ " JA 'd0 \n",
+			  dst = [munchExp(e1),munchExp(e2)],
+			  src = [],
+			  jump = [l1,l2]})
+	|   munchStm(CJUMP(UGE,e1,e2,l1,l2)) =	
+		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
+				  ^ " JAE 'd0 \n",
+			  dst = [munchExp(e1),munchExp(e2)],
+			  src = [],
+			  jump = [l1,l2]})
+
+
+
+
+
+
+
+
+
+
 	|   munchStm(LABEL lab ) = 
 		emit(OPER{assem = lab ^ ": \n", lab=lab }) 
 	(* munchStm::Tree.stm -> unit *)
