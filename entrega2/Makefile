@@ -70,14 +70,16 @@ tigermain.uo: tigerseman.ui tigerescap.ui tigergrm.ui tigerlex.uo \
 tigerescap.uo: tigerescap.ui tigertab.ui tigerabs.uo 
 tigerseman.uo: tigerseman.ui tigersres.uo tigertab.ui tigerpila.ui \
     topsort.uo tigerinterp.uo tigertemp.ui tigerabs.uo tigertrans.ui 
+Listsort.uo: Listsort.ui 
 tigertemp.uo: tigertemp.ui 
 tigertrans.uo: tigertrans.ui tigertree.uo tigerpila.ui tigerframe.ui \
-    tigerit.uo tigercanon.ui tigertemp.ui tigerabs.uo 
+    tigerit.uo tigercanon.ui tigertemp.ui tigerabs.uo Listsort.ui 
 tigerpila.uo: tigerpila.ui 
 tigerframe.uo: tigerframe.ui tigertree.uo tigertemp.ui 
 tigergrm.uo: tigergrm.ui tigernlin.uo tigerabs.uo 
 tigerframe.ui: tigertree.uo tigertemp.ui 
 tigerpp.uo: tigerabs.uo 
+tigercodegen.uo: tigercodegen.ui 
 tigerescap.ui: tigerabs.uo 
 tigerlex.uo: tigergrm.ui tigernlin.uo 
 tigertab.uo: tigertab.ui 

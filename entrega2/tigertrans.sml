@@ -5,7 +5,7 @@ open tigertree
 open tigertemp
 open tigerabs
 open tigercanon
-open Listsort
+(*open Listsort*)
 (*load "Listsort"*)
 
 exception breakexc
