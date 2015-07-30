@@ -7,7 +7,7 @@ let val ilist = ref (nil: A.instr list)
 	fun result(gen) = let val t = Temp.newtemp() in gen t; t end
 	(* munchStm::Tree.stm -> unit *)
 	fun munchStm(SEQ(a, b)) = (munchStm a; munchStm b)(*primer stm*)
-	(*comenzamos por el final, para ir de los arboles mas simples a los mas complejos*)
+	(*comenzamos por el final, para ir de los arboles mas simples a los mas complejos. Feli dice: no es al reves? Ir de los mas complejos a los mas simples?*)
 	|   munchStm(MOVE(TEMP i,BINOP(PLUS,MEM(CONST j),e1))) = 
 		emit(OPER{assem = "MOV 'd0, " ^ int j ^ "["^e1^"]\n"
 			  dst = [i],
