@@ -4,6 +4,7 @@ struct
 open tigerabs
 open tigersres
 open tigertrans
+open tigercodegen
 
 type expty = {exp: unit, ty: Tipo}
 
@@ -457,6 +458,7 @@ fun transExp(venv, tenv) =
 			val _ = List.map print (List.map Ir (frags))
 			val _ = print "----------------\n"
 			val (a,b) = otroCanonizeFrag (getResult ())
+			val _ = List.map (fn (xs,y) => List.map (fn x => codegen y x) xs) a
 			val _ = tigerinterp.inter false a b
 		in	print "bien!\n" end
 	end

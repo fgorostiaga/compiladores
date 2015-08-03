@@ -1,100 +1,102 @@
 
+open tigertree
+open tigerassem
 
-fun codegen (frame) (stm: Tree.stm) : Assem.instr list = 
+fun codegen (frame) (stm: tigertree.stm) : tigerassem.instr list = 
 
-let val ilist = ref (nil: A.instr list)
+let val ilist = ref (nil: tigerassem.instr list)
 	fun emit x = ilist := x :: !ilist
-	fun result(gen) = let val t = Temp.newtemp() in gen t; t end
+	fun result(gen) = let val t = tigertemp.newtemp() in gen t; t end
 	(* munchStm::Tree.stm -> unit *)
 	fun munchStm(SEQ(a, b)) = (munchStm a; munchStm b)(*primer stm*)
 	(*comenzamos por el final, para ir de los arboles mas simples a los mas complejos. Feli dice: no es al reves? Ir de los mas complejos a los mas simples?*)
-	|   munchStm(MOVE(TEMP i,BINOP(PLUS,MEM(CONST j),e1))) = 
-		emit(OPER{assem = "MOV 'd0, " ^ int j ^ "["^e1^"]\n"
+	|   munchStm(tigertree.MOVE(TEMP i,BINOP(PLUS,MEM(CONST j),e1))) =  (*Por que esta este "MEM"? El pattern no deberia matchear mas bien con MOVE (TEMP i, BINOP(PLUS,CONST j, MEM(m))) ? *)
+		emit(OPER{assem = "MOV 'd0, " ^(Int.toString j) ^ "['s0]\n", (*La forma no deberia ser MOV 'd0, j('s0)?*)
+			  dst = [i],
+			  src = [munchExp(e1)],
+			  jump = NONE})
+	|   munchStm(tigertree.MOVE(TEMP i, e1)) =
+		emit(OPER{assem = "MOV 'd0, 's0 \n",
 			  dst = [i],
 			  src = [munchExp(e1)],
 			  jump = NONE}) 
-	|   munchStm(MOVE(TEMP i, e1)) =
-		emit(OPER{assem = "MOV 'd0, 's0 \n"
-			  dst = [i],
-			  src = [munchExp(e1)]
-			  jump = NONE}) 
-	|   munchStm(MOVE(TEMP i, CONST j)) = 
-		emit(OPER{assem = "MOV 'd0, " ^ int i ^ " \n", 
+	|   munchStm(tigertree.MOVE(TEMP i, CONST j)) = 
+		emit(OPER{assem = "MOV 'd0, " ^ (Int.toString j) ^ " \n", 
 			  dst = [i],
 			  src = [],
 			  jump = NONE})
 	|   munchStm(EXP(e)) = 
-		emit(OPER{assem = "MOV 'd0, s0 \n"
-			  dst = [Temp.newtemp()],
+		emit(OPER{assem = "MOV 'd0, 's0 \n",
+			  dst = [tigertemp.newtemp()],
 			  src = [munchExp(e)],
 			  jump = NONE})
 	|   munchStm(JUMP(e,lls)) =	
-		emit(OPER{assem = "JMP 'd0 \n"
+		emit(OPER{assem = "JMP 'd0 \n",
 			  dst = [munchExp(e)],
 			  src = [],
-			  jump = lls})
-	|   munchStm(CJUMP(EQ,e1,e2,l1,l2)) =	
-		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
-				  ^ " JE 'd0 \n",
-			  dst = [munchExp(e1),munchExp(e2)],
-			  src = [],
-			  jump = [l1,l2]})
+			  jump = SOME lls})
+	|   munchStm(CJUMP(EQ,e1,e2,l1,l2)) =
+		emit(OPER{assem = " CMP ['s0],['s1] \n"
+				  ^ " JE 'j0 \n",
+			  dst = [],
+			  src = [munchExp(e1),munchExp(e2)],
+			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(NE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
-				  ^ " JNE 'd0 \n",
-			  dst = [munchExp(e1),munchExp(e2)],
-			  src = [],
-			  jump = [l1,l2]})
+		emit(OPER{assem = " CMP ['s0] ['s1] \n"
+				  ^ " JNE 'j0 \n",
+			  src = [munchExp(e1),munchExp(e2)],
+			  dst = [],
+			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(LT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
-				  ^ " JL 'd0 \n",
-			  dst = [munchExp(e1),munchExp(e2)],
-			  src = [],
-			  jump = [l1,l2]})
+		emit(OPER{assem = " CMP ['s0] ['s1] \n"
+				  ^ " JL 'j0 \n",
+			  src = [munchExp(e1),munchExp(e2)],
+			  dst = [],
+			  jump = SOME [l1,l2]})
 
 	|   munchStm(CJUMP(GT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
-				  ^ " JG 'd0 \n",
-			  dst = [munchExp(e1),munchExp(e2)],
-			  src = [],
-			  jump = [l1,l2]})
+		emit(OPER{assem = " CMP ['s0] ['s1] \n"
+				  ^ " JG 'j0 \n",
+			  src = [munchExp(e1),munchExp(e2)],
+			  dst = [],
+			  jump = SOME [l1,l2]})
 
 	|   munchStm(CJUMP(LE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
-				  ^ " JLE 'd0 \n",
-			  dst = [munchExp(e1),munchExp(e2)],
-			  src = [],
-			  jump = [l1,l2]})
+		emit(OPER{assem = " CMP ['s0] ['s1] \n"
+				  ^ " JLE 'j0 \n",
+			  src = [munchExp(e1),munchExp(e2)],
+			  dst = [],
+			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(GE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
-				  ^ " JGE 'd0 \n",
-			  dst = [munchExp(e1),munchExp(e2)],
-			  src = [],
-			  jump = [l1,l2]})
+		emit(OPER{assem = " CMP ['s0] ['s1] \n"
+				  ^ " JGE 'j0 \n",
+			  src = [munchExp(e1),munchExp(e2)],
+			  dst = [],
+			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(ULT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
-				  ^ " JB 'd0 \n",
-			  dst = [munchExp(e1),munchExp(e2)],
-			  src = [],
-			  jump = [l1,l2]})
+		emit(OPER{assem = " CMP ['s0] ['s1] \n"
+				  ^ " JB 'j0 \n",
+			  src = [munchExp(e1),munchExp(e2)],
+			  dst = [],
+			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(ULE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
-				  ^ " JBE 'd0 \n",
-			  dst = [munchExp(e1),munchExp(e2)],
-			  src = [],
-			  jump = [l1,l2]})
+		emit(OPER{assem = " CMP ['s0] ['s1] \n"
+				  ^ " JBE 'j0 \n",
+			  src = [munchExp(e1),munchExp(e2)],
+			  dst = [],
+			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(UGT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
-				  ^ " JA 'd0 \n",
-			  dst = [munchExp(e1),munchExp(e2)],
-			  src = [],
-			  jump = [l1,l2]})
+		emit(OPER{assem = " CMP ['s0] ['s1] \n"
+				  ^ " JA 'j0 \n",
+			  src = [munchExp(e1),munchExp(e2)],
+			  dst = [],
+			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(UGE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = " CMP ["^e1^"],["^e2^"] \n"
-				  ^ " JAE 'd0 \n",
-			  dst = [munchExp(e1),munchExp(e2)],
-			  src = [],
-			  jump = [l1,l2]})
+		emit(OPER{assem = " CMP ['s0] ['s1] \n"
+				  ^ " JAE 'j0 \n",
+			  src = [munchExp(e1),munchExp(e2)],
+			  dst = [],
+			  jump = SOME [l1,l2]})
 
 
 
@@ -105,14 +107,14 @@ let val ilist = ref (nil: A.instr list)
 
 
 
-	|   munchStm(LABEL lab ) = 
-		emit(OPER{assem = lab ^ ": \n", lab=lab }) 
+	|   munchStm(tigertree.LABEL lab ) = 
+		emit(LABEL{assem = lab ^ ": \n", lab=lab }) 
 	(* munchStm::Tree.stm -> unit *)
 	and(*comenzamos por las exp mas simples, que van "abajo" en el pattern matching*)
-	(* munchExp::Tree.exp -> Temp.temp *)
+	(* munchExp::Tree.exp -> tigertemp.temp *)
 
 	 munchExp(CONST i) = (*no estoy seguro de esta. 'd0 deberia tener 0*)
-		result(fn r => emit(OPER{assem = "ADD 'd0, "^int i^" \n"
+		result(fn r => emit(OPER{assem = "ADD 'd0, "^(Int.toString i)^" \n",
 			src = [],
 			dst = [r],
 			jump = NONE})) 
