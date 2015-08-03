@@ -15,16 +15,16 @@ let val ilist = ref (nil: tigerassem.instr list)
 			  dst = [i],
 			  src = [munchExp(e1)],
 			  jump = NONE})
-	|   munchStm(tigertree.MOVE(TEMP i, e1)) =
-		emit(OPER{assem = "MOV 'd0, 's0 \n",
-			  dst = [i],
-			  src = [munchExp(e1)],
-			  jump = NONE}) 
 	|   munchStm(tigertree.MOVE(TEMP i, CONST j)) = 
 		emit(OPER{assem = "MOV 'd0, " ^ (Int.toString j) ^ " \n", 
 			  dst = [i],
 			  src = [],
 			  jump = NONE})
+	|   munchStm(tigertree.MOVE(TEMP i, e1)) =
+		emit(OPER{assem = "MOV 'd0, 's0 \n",
+			  dst = [i],
+			  src = [munchExp(e1)],
+			  jump = NONE}) 
 	|   munchStm(EXP(e)) = 
 		emit(OPER{assem = "MOV 'd0, 's0 \n",
 			  dst = [tigertemp.newtemp()],
@@ -97,18 +97,9 @@ let val ilist = ref (nil: tigerassem.instr list)
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
-
-
-
-
-
-
-
-
-
-
 	|   munchStm(tigertree.LABEL lab ) = 
 		emit(LABEL{assem = lab ^ ": \n", lab=lab }) 
+	|	munchStm _ = raise Fail "aca"
 	(* munchStm::Tree.stm -> unit *)
 	and(*comenzamos por las exp mas simples, que van "abajo" en el pattern matching*)
 	(* munchExp::Tree.exp -> tigertemp.temp *)
