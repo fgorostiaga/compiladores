@@ -10,8 +10,8 @@ structure tigerassem = struct
 			    jump: label list option}
                  | LABEL of {assem: string, lab: tigertemp.label}
                  | MOVE of {assem: string, 
-			    dst: temp,
-			    src: temp}
+			    			dst: temp,
+			    			src: temp}
 
   fun format saytemp =
     let 

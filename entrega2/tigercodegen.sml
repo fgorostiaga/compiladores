@@ -1,8 +1,11 @@
 
 open tigertree
 open tigerassem
+open tigerframe
 
-fun codegen (frame) (stm: tigertree.stm) : tigerassem.instr list = 
+fun codegen2 frags =
+
+let fun codegen (stm: tigertree.stm) : tigerassem.instr list =  (*Saque el argumento frame porque tenemos FP. Referirse a pagina 206 del Appel para mas detalles. Gracias, vuelva prontos.*)
 
 let val ilist = ref (nil: tigerassem.instr list)
 	fun emit x = ilist := x :: !ilist
@@ -11,12 +14,11 @@ let val ilist = ref (nil: tigerassem.instr list)
 	fun munchStm(SEQ(a, b)) = (munchStm a; munchStm b)(*primer stm*)
 	(*comenzamos por el final, para ir de los arboles mas simples a los mas complejos. Feli dice: no es al reves? Ir de los mas complejos a los mas simples?*)
 	|   munchStm(tigertree.MOVE(TEMP i,BINOP(PLUS,MEM(CONST j),e1))) =  (*Por que esta este "MEM"? El pattern no deberia matchear mas bien con MOVE (TEMP i, BINOP(PLUS,CONST j, MEM(m))) ? *)
-		emit(OPER{assem = "MOV 'd0, " ^(Int.toString j) ^ "['s0]\n", (*La forma no deberia ser MOV 'd0, j('s0)?*)
-			  dst = [i],
-			  src = [munchExp(e1)],
-			  jump = NONE})
+		emit(MOVE{assem = "MOV 'd0, " ^(Int.toString j) ^ "['s0]\n", (*La forma no deberia ser MOV 'd0, j('s0)?*)
+			  dst = i,
+			  src = munchExp(e1)})
 	|   munchStm(tigertree.MOVE(TEMP i, CONST j)) = 
-		emit(OPER{assem = "MOV 'd0, " ^ (Int.toString j) ^ " \n", 
+		emit(OPER{assem = "MOV 'd0, " ^ (Int.toString j) ^ " \n", (*Hay que cambiar los OPER por MOVE cuando sea necesario*)
 			  dst = [i],
 			  src = [],
 			  jump = NONE})
@@ -136,9 +138,15 @@ let val ilist = ref (nil: tigerassem.instr list)
 			dst = [r],
 			jump = NONE})  )
 	|    munchExp(TEMP t) = t
-	|	munchExp _ = result (fn r=>r)
+	|	munchExp _ = result (fn r=>emit(OPER{assem="NADA.\n",src=[], dst=[], jump=NONE}))
 	     
 
 in munchStm stm;
 	rev(!ilist)
 end
+		fun aux2(PROC{body, frame}) = codegen body
+		| aux2(STRING(l, "")) = [(LABEL{assem = l ^ ": \n", lab=l })]
+		| aux2(STRING(l, s)) = [(LABEL{assem = l^":\t"^s^"\n", lab=l })]
+		fun aux3 [] = []
+		| aux3(h::t) = (aux2 h)@(aux3 t)
+	in	aux3 frags end

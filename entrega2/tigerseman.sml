@@ -454,13 +454,14 @@ fun transExp(venv, tenv) =
 							body=UnitExp 0}, 0)
 			val {exp = e, ty = tbody} = transExp(tab_vars, tab_tipos) main
 			(*val _ = print (Ir (getResult ()))*)
-			val frags = List.map canonizeFrag (getResult ())
+			val res = getResult ()
+			val frags = List.map canonizeFrag res
 			val _ = print "Todos los frags:\n"
 			val _ = List.map print (List.map Ir (frags))
 			val _ = print "----------------\n"
-			val (a,b) = otroCanonizeFrag (getResult ())
-			val resu = List.map (format (fn x=>x)) (List.concat (List.concat ((List.map (fn (xs,y) => List.map (fn x => codegen y x) xs) a))))
-			val _ = List.map print resu
+			val (a,b) = otroCanonizeFrag res
+			val assems = List.map (format (fn x=>x)) (List.concat ((List.map (fn x => codegen2 x) frags)))
+			val _ = List.map print assems
 			val _ = tigerinterp.inter false a b
 		in	print "bien!\n" end
 	end
