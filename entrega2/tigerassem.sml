@@ -13,18 +13,18 @@ structure tigerassem = struct
 			    dst: temp,
 			    src: temp}
 
-  (*fun format saytemp =
+  fun format saytemp =
     let 
 	fun speak(assem,dst,src,jump) =
-	    let val saylab = Symbol.name    
-		fun f(#"`":: #"s":: i::rest) = 
+	    let val saylab = fn x=>x
+		fun f(#"'":: #"s":: i::rest) = 
 		    (explode(saytemp(List.nth(src,ord i - ord #"0"))) @ f rest)
-		  | f( #"`":: #"d":: i:: rest) = 
+		  | f( #"'":: #"d":: i:: rest) = 
 		    (explode(saytemp(List.nth(dst,ord i - ord #"0"))) @ f rest)
-		  | f( #"`":: #"j":: i:: rest) = 
+		  | f( #"'":: #"j":: i:: rest) = 
 		    (explode(saylab(List.nth(jump,ord i - ord #"0"))) @ f rest)
-		  | f( #"`":: #"`":: rest) = #"`" :: f rest
-		  | f( #"`":: _ :: rest) = ErrorMsg.impossible "bad Assem format"
+		  | f( #"'":: #"`":: rest) = #"'" :: f rest
+		  | f( #"'":: _ :: rest) = raise Fail "bad Assem format"
 		  | f(c :: rest) = (c :: f rest)
 		  | f nil = nil
 	    in implode(f(explode assem))
@@ -33,7 +33,7 @@ structure tigerassem = struct
           | OPER{assem,dst,src,jump=SOME j} => speak(assem,dst,src,j)
 	  | LABEL{assem,...} => assem
 	  | MOVE{assem,dst,src} => speak(assem,[dst],[src],nil)
-    end*) 
+    end
 
 end
 
