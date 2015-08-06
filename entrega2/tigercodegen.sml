@@ -28,15 +28,15 @@ let val ilist = ref (nil: tigerassem.instr list)
 			  src = [munchExp(e1)],
 			  jump = NONE}) 
 	|   munchStm(tigertree.MOVE(MEM e0, e1)) =
-		emit(OPER{assem = "MOV ['s0], 's0 \n",
-			  dst = [],
+		emit(OPER{assem = "MOV ['d0], 's0 \n",
+			  dst = [munchExp e0],
 			  src = [munchExp(e1)],
 			  jump = NONE}) 
-	|   munchStm(JUMP(e,lls)) =	
+	|   munchStm(JUMP(NAME e,lls)) =	
 		emit(OPER{assem = "JMP 'j0 \n",
-			  dst = [munchExp(e)],
+			  dst = [],
 			  src = [],
-			  jump = SOME lls})
+			  jump = SOME [e]})
 	|   munchStm(CJUMP(EQ,e1,e2,l1,l2)) =
 		emit(OPER{assem = "CMP ['s0],['s1] \n"
 				  ^ "JE 'j0 \n",
@@ -142,7 +142,7 @@ let val ilist = ref (nil: tigerassem.instr list)
 			dst = [r],
 			jump = NONE})  )
 	|    munchExp(TEMP t) = t
-	|	munchExp _ = result (fn r=>emit(OPER{assem="NADA.\n",src=[], dst=[], jump=NONE}))
+	|	munchExp exp = result (fn r=>emit(OPER{assem="NADA: "^(ppEXP exp)^"\n",src=[], dst=[], jump=NONE}))
 
 	and munchArgs _ = []
 	     
