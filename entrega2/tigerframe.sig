@@ -28,5 +28,6 @@ val procEntryExit1 : frame * tigertree.stm -> tigertree.stm
 datatype frag = PROC of {body: tigertree.stm, frame: frame}
 	| STRING of tigertemp.label * string
 val getArgForPos : int -> access
+val argregs : tigertemp.temp list
 
 end

@@ -18,7 +18,7 @@ let val ilist = ref (nil: tigerassem.instr list)
 			  dst = i,
 			  src = munchExp(e1)})
 	|   munchStm(tigertree.MOVE(TEMP i, CONST j)) = 
-		emit(OPER{assem = "MOV 'd0, " ^ (Int.toString j) ^ " \n", (*Hay que cambiar los OPER por MOVE cuando sea necesario*)
+		emit(OPER{assem = "MOV 'd0, " ^ (Int.toString j) ^ " \n", (*Hay que cambiar los OPER por MOVE cuando sea necesario. Aca, por ejemplo, no lo es. ;P*)
 			  dst = [i],
 			  src = [],
 			  jump = NONE})
@@ -32,11 +32,6 @@ let val ilist = ref (nil: tigerassem.instr list)
 			  dst = [],
 			  src = [munchExp(e1)],
 			  jump = NONE}) 
-	|   munchStm(EXP(e)) = 
-		emit(OPER{assem = "MOV 'd0, 's0 \n",
-			  dst = [tigertemp.newtemp()],
-			  src = [munchExp(e)],
-			  jump = NONE})
 	|   munchStm(JUMP(e,lls)) =	
 		emit(OPER{assem = "JMP 'j0 \n",
 			  dst = [munchExp(e)],
@@ -106,6 +101,15 @@ let val ilist = ref (nil: tigerassem.instr list)
 			  jump = SOME [l1,l2]})
 	|   munchStm(tigertree.LABEL lab ) = 
 		emit(LABEL{assem = lab ^ ": \n", lab=lab }) 
+	|	munchStm (EXP(CALL (NAME n,args))) =
+			emit(OPER{assem="CALL "^n^"\n",
+						src=munchArgs(0,args),
+						dst=argregs,
+						jump=NONE})
+	|   munchStm(EXP(e)) = 
+		emit(MOVE{assem = "MOV 'd0, 's0 \n",
+			  dst = tigertemp.newtemp(),
+			  src = munchExp(e)})
 	|	munchStm _ = emit (OPER{assem = "nada.\n",
 				src	 = [], dst = [], jump = NONE})
 	(* munchStm::Tree.stm -> unit *)
@@ -113,12 +117,12 @@ let val ilist = ref (nil: tigerassem.instr list)
 	(* munchExp::Tree.exp -> tigertemp.temp *)
 
 	 munchExp(CONST i) = (*no estoy seguro de esta. 'd0 deberia tener 0*)
-		result(fn r => emit(OPER{assem = "ADD 'd0, "^(Int.toString i)^" \n",
+		result(fn r => emit(OPER{assem = "MOV 'd0, "^(Int.toString i)^" \n",
 			src = [],
 			dst = [r],
 			jump = NONE})) 
 	|    munchExp(BINOP(MINUS,e1,e2)) =
-		result(fn r => emit(OPER{assem = "SUB 'd0 's0\n",
+		result(fn r => emit(OPER{assem = "SUB 'd0 's0\n", (*Y s1?*)
 			src = [munchExp(e1), munchExp(e2)],
 			dst = [r],
 			jump = NONE}))
@@ -139,6 +143,8 @@ let val ilist = ref (nil: tigerassem.instr list)
 			jump = NONE})  )
 	|    munchExp(TEMP t) = t
 	|	munchExp _ = result (fn r=>emit(OPER{assem="NADA.\n",src=[], dst=[], jump=NONE}))
+
+	and munchArgs _ = []
 	     
 
 in munchStm stm;
