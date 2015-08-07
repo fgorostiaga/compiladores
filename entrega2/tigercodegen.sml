@@ -19,106 +19,101 @@ let val ilist = ref (nil: tigerassem.instr list)
 						dst=argregs,
 						jump=NONE})
 	|	munchStm (tigertree.MOVE(TEMP i, TEMP j)) =
-			emit(MOVE{assem = "MOV 'd0, 's0\n",
+			emit(MOVE{assem = "MOV 's0, 'd0\n",
 					dst = i,
 					src = j})
 	|	munchStm (tigertree.MOVE(TEMP i,CALL (NAME n,args))) = (*Function call*)
 			(munchStm(EXP(CALL(NAME n,args)));
-			emit(MOVE{assem = "MOV 'd0, 's0 \n",
+			emit(MOVE{assem = "MOV 's0, 'd0 \n",
 				  dst = i,
 				  src = rv}))
-	|   munchStm(tigertree.MOVE(TEMP i,BINOP(PLUS,MEM(CONST j),e1))) =  (*Por que esta este "MEM"? El pattern no deberia matchear mas bien con MOVE (TEMP i, BINOP(PLUS,CONST j, MEM(m))) ? *)
-		emit(MOVE{assem = "MOV 'd0, " ^(Int.toString j) ^ "['s0]\n", (*La forma no deberia ser MOV 'd0, j('s0)?*)
+	|   munchStm(tigertree.MOVE(TEMP i,BINOP(PLUS,CONST j,e1))) =  (*Por que esta este "MEM"? El pattern no deberia matchear mas bien con MOVE (TEMP i, BINOP(PLUS,CONST j, MEM(m))) ? *)
+		emit(MOVE{assem = "MOV 's0, " ^(Int.toString j) ^ "('d0)\n", (*La forma no deberia ser MOV 'd0, j('s0)?*)
 			  dst = i,
 			  src = munchExp(e1)})
 	|   munchStm(tigertree.MOVE(TEMP i, CONST j)) = 
-		emit(OPER{assem = "MOV 'd0, " ^ (Int.toString j) ^ " \n", (*Hay que cambiar los OPER por MOVE cuando sea necesario. Aca, por ejemplo, no lo es. ;P*)
+		emit(OPER{assem = "MOV $" ^ (Int.toString j) ^ ", 'd0 \n", (*Hay que cambiar los OPER por MOVE cuando sea necesario. Aca, por ejemplo, no lo es. ;P*)
 			  dst = [i],
 			  src = [],
 			  jump = NONE})
 	|   munchStm(tigertree.MOVE(TEMP i, e1)) =
-		emit(OPER{assem = "MOV 'd0, 's0 \n",
-			  dst = [i],
-			  src = [munchExp(e1)],
-			  jump = NONE}) 
+		emit(MOVE{assem = "MOV 's0, 'd0 \n",
+			  dst = i,
+			  src = munchExp(e1)}) 
 	|   munchStm(tigertree.MOVE(MEM e0, e1)) =
-		emit(OPER{assem = "MOV ['d0], 's0 \n",
-			  dst = [munchExp e0],
-			  src = [munchExp(e1)],
-			  jump = NONE}) 
+		emit(MOVE{assem = "MOV ('d0), 's0 \n",
+			  dst = munchExp e0,
+			  src = munchExp(e1)}) 
 	|   munchStm(JUMP(NAME e,lls)) =	
 		emit(OPER{assem = "JMP 'j0 \n",
 			  dst = [],
 			  src = [],
 			  jump = SOME [e]})
 	|   munchStm(CJUMP(EQ,e1,e2,l1,l2)) =
-		emit(OPER{assem = "CMP 's0 's1 \n"
+		emit(OPER{assem = "CMP 's0, 's1 \n"
 				  ^ "JE 'j0 \n",
 			  dst = [],
 			  src = [munchExp(e1),munchExp(e2)],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(NE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's0 's1 \n"
+		emit(OPER{assem = "CMP 's0, 's1 \n"
 				  ^ "JNE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(LT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's0 's1 \n"
+		emit(OPER{assem = "CMP 's0, 's1 \n"
 				  ^ "JL 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 
 	|   munchStm(CJUMP(GT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's0 's1 \n"
+		emit(OPER{assem = "CMP 's0, 's1 \n"
 				  ^ "JG 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 
 	|   munchStm(CJUMP(LE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's0 's1 \n"
+		emit(OPER{assem = "CMP 's0, 's1 \n"
 				  ^ "JLE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(GE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's0 's1 \n"
+		emit(OPER{assem = "CMP 's0, 's1 \n"
 				  ^ "JGE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(ULT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's0 's1 \n"
+		emit(OPER{assem = "CMP 's0, 's1 \n"
 				  ^ "JB 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(ULE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's0 's1 \n"
+		emit(OPER{assem = "CMP 's0, 's1 \n"
 				  ^ "JBE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(UGT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's0 's1 \n"
+		emit(OPER{assem = "CMP 's0, 's1 \n"
 				  ^ "JA 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(UGE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's0 's1 \n"
+		emit(OPER{assem = "CMP 's0, 's1 \n"
 				  ^ "JAE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(tigertree.LABEL lab ) = 
 		emit(LABEL{assem = lab ^ ": \n", lab=lab }) 
-	|   munchStm(EXP(e)) = 
-		emit(MOVE{assem = "MOV 'd0, 's0 \n",
-			  dst = tigertemp.newtemp(),
-			  src = munchExp(e)})
+	|   munchStm(EXP(e)) = (munchExp e;())
 	|	munchStm _ = emit (OPER{assem = "nada.\n",
 				src	 = [], dst = [], jump = NONE})
 	(* munchStm::Tree.stm -> unit *)
@@ -126,36 +121,36 @@ let val ilist = ref (nil: tigerassem.instr list)
 	(* munchExp::Tree.exp -> tigertemp.temp *)
 
 	 munchExp(CONST i) = (*no estoy seguro de esta. 'd0 deberia tener 0*)
-		result(fn r => emit(OPER{assem = "MOV 'd0, "^(Int.toString i)^" \n",
+		result(fn r => emit(OPER{assem = "MOV $"^(Int.toString i)^", 'd0 \n",
 			src = [],
 			dst = [r],
 			jump = NONE})) 
 	|    munchExp(BINOP(MINUS,e1,e2)) =
-		result(fn r => emit(OPER{assem = "MOV 'd0 's0\nSUB 'd0 's1\n",
+		result(fn r => emit(OPER{assem = "MOV 's0, 'd0\nSUB 's1, 'd0\n",
 			src = [munchExp(e1), munchExp(e2)],
 			dst = [r],
 			jump = NONE}))
 	|    munchExp(BINOP(DIV,e1,e2)) =
-		result(fn r => emit(OPER{assem = "MOV 'd0 's0\nDIV 'd0 's1\n",
+		result(fn r => emit(OPER{assem =  "MOV 's0, 'd0\nDIV 's1, 'd0\n",
 			src = [munchExp(e1), munchExp(e2)],
 			dst = [r],
 			jump = NONE}))
 	|    munchExp(BINOP(MUL,e1,e2)) =
-		result(fn r => emit(OPER{assem = "MOV 'd0 's0\nMUL 'd0 's1\n",
+		result(fn r => emit(OPER{assem =  "MOV 's0, 'd0\nMUL 's1, 'd0\n",
 			src = [munchExp(e1), munchExp(e2)],
 			dst = [r],
 			jump = NONE}))
 	|    munchExp(BINOP(PLUS,e1,e2)) =
-		result(fn r => emit(OPER{assem = "MOV 'd0 's0\nADD 'd0 's1\n",
+		result(fn r => emit(OPER{assem =  "MOV 's0, 'd0\nADD 's1, 'd0\n",
 			src = [munchExp(e1), munchExp(e2)],
 			dst = [r],
 			jump = NONE})  )
 	|    munchExp(TEMP t) = t
-	|	munchExp (MEM e) = result (fn r=> emit(OPER{assem="MOV 'd0 ['s0]\n",
+	|	munchExp (MEM e) = result (fn r=> emit(OPER{assem="MOV ['s0], 'd0\n",
 													dst = [r],
 													src = [munchExp e],
 													jump = NONE}))
-	|	munchExp (NAME l) = result (fn r=> emit(OPER{assem="MOV 'd0 $"^l^"\n",
+	|	munchExp (NAME l) = result (fn r=> emit(OPER{assem="MOV $"^l^", 'd0\n",
 														dst=[r],
 														src=[],
 														jump=NONE}))
@@ -164,11 +159,11 @@ let val ilist = ref (nil: tigerassem.instr list)
 	and munchArgs [] = []
 		|munchArgs(arg::args) = let val temp = munchExp(arg)
 										in (case (getArgForPos (List.length args)) of
-														InReg reg => (emit(MOVE {assem = "MOV 'd0, 's0\n",
+														InReg reg => (emit(MOVE {assem = "MOV 's0, 'd0\n",
 																				dst = reg,
 																				src = temp})														
 																	;(reg :: munchArgs args))
-														|InFrame offset => (emit(OPER {assem = "PUSHQ 's0\n",
+														|InFrame offset => (emit(OPER {assem = "PUSHQ 's0\n", (*medio hack*)
 																						dst = [],
 																						src = [temp],
 																						jump = NONE})
@@ -181,7 +176,7 @@ in munchStm stm;
 end
 		fun aux2(PROC{body, frame}) = codegen body
 		| aux2(STRING(l, "")) = [(LABEL{assem = l ^ ": \n", lab=l })]
-		| aux2(STRING(l, s)) = [(LABEL{assem = l^":\t"^s^"\n", lab=l })]
+		| aux2(STRING(l, s)) = [(LABEL{assem = l^":\n\t.string \""^s^"\"\n", lab=l })]
 		fun aux3 [] = []
 		| aux3(h::t) = (aux2 h)@(aux3 t)
 	in	aux3 frags end
