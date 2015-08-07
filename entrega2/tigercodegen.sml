@@ -18,11 +18,12 @@ let val ilist = ref (nil: tigerassem.instr list)
 						src=munchArgs (List.rev args),
 						dst=argregs,
 						jump=NONE})
+	|	munchStm (tigertree.MOVE(TEMP i, TEMP j)) =
+			emit(MOVE{assem = "MOV 'd0, 's0\n",
+					dst = i,
+					src = j})
 	|	munchStm (tigertree.MOVE(TEMP i,CALL (NAME n,args))) = (*Function call*)
-			(emit(OPER{assem="CALL "^n^"\n",
-						src=munchArgs (List.rev args),
-						dst=argregs,
-						jump=NONE});
+			(munchStm(EXP(CALL(NAME n,args)));
 			emit(MOVE{assem = "MOV 'd0, 's0 \n",
 				  dst = i,
 				  src = rv}))
@@ -51,63 +52,63 @@ let val ilist = ref (nil: tigerassem.instr list)
 			  src = [],
 			  jump = SOME [e]})
 	|   munchStm(CJUMP(EQ,e1,e2,l1,l2)) =
-		emit(OPER{assem = "CMP ['s0],['s1] \n"
+		emit(OPER{assem = "CMP 's0 's1 \n"
 				  ^ "JE 'j0 \n",
 			  dst = [],
 			  src = [munchExp(e1),munchExp(e2)],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(NE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP ['s0] ['s1] \n"
+		emit(OPER{assem = "CMP 's0 's1 \n"
 				  ^ "JNE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(LT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP ['s0] ['s1] \n"
+		emit(OPER{assem = "CMP 's0 's1 \n"
 				  ^ "JL 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 
 	|   munchStm(CJUMP(GT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP ['s0] ['s1] \n"
+		emit(OPER{assem = "CMP 's0 's1 \n"
 				  ^ "JG 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 
 	|   munchStm(CJUMP(LE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP ['s0] ['s1] \n"
+		emit(OPER{assem = "CMP 's0 's1 \n"
 				  ^ "JLE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(GE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP ['s0] ['s1] \n"
+		emit(OPER{assem = "CMP 's0 's1 \n"
 				  ^ "JGE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(ULT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP ['s0] ['s1] \n"
+		emit(OPER{assem = "CMP 's0 's1 \n"
 				  ^ "JB 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(ULE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP ['s0] ['s1] \n"
+		emit(OPER{assem = "CMP 's0 's1 \n"
 				  ^ "JBE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(UGT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP ['s0] ['s1] \n"
+		emit(OPER{assem = "CMP 's0 's1 \n"
 				  ^ "JA 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(UGE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP ['s0] ['s1] \n"
+		emit(OPER{assem = "CMP 's0 's1 \n"
 				  ^ "JAE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
@@ -130,26 +131,34 @@ let val ilist = ref (nil: tigerassem.instr list)
 			dst = [r],
 			jump = NONE})) 
 	|    munchExp(BINOP(MINUS,e1,e2)) =
-		result(fn r => emit(OPER{assem = "SUB 'd0 's0\n", (*Y s1?*)
+		result(fn r => emit(OPER{assem = "MOV 'd0 's0\nSUB 'd0 's1\n",
 			src = [munchExp(e1), munchExp(e2)],
 			dst = [r],
 			jump = NONE}))
 	|    munchExp(BINOP(DIV,e1,e2)) =
-		result(fn r => emit(OPER{assem = "DIV 'd0 's0\n",
+		result(fn r => emit(OPER{assem = "MOV 'd0 's0\nDIV 'd0 's1\n",
 			src = [munchExp(e1), munchExp(e2)],
 			dst = [r],
 			jump = NONE}))
 	|    munchExp(BINOP(MUL,e1,e2)) =
-		result(fn r => emit(OPER{assem = "MUL 'd0 's0\n",
+		result(fn r => emit(OPER{assem = "MOV 'd0 's0\nMUL 'd0 's1\n",
 			src = [munchExp(e1), munchExp(e2)],
 			dst = [r],
 			jump = NONE}))
 	|    munchExp(BINOP(PLUS,e1,e2)) =
-		result(fn r => emit(OPER{assem = "ADD 'd0 's0\n",
+		result(fn r => emit(OPER{assem = "MOV 'd0 's0\nADD 'd0 's1\n",
 			src = [munchExp(e1), munchExp(e2)],
 			dst = [r],
 			jump = NONE})  )
 	|    munchExp(TEMP t) = t
+	|	munchExp (MEM e) = result (fn r=> emit(OPER{assem="MOV 'd0 ['s0]\n",
+													dst = [r],
+													src = [munchExp e],
+													jump = NONE}))
+	|	munchExp (NAME l) = result (fn r=> emit(OPER{assem="MOV 'd0 $"^l^"\n",
+														dst=[r],
+														src=[],
+														jump=NONE}))
 	|	munchExp exp = result (fn r=>emit(OPER{assem="NADA: "^(ppEXP exp)^"\n",src=[], dst=[], jump=NONE}))
 
 	and munchArgs [] = []
