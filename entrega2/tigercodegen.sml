@@ -13,6 +13,19 @@ let val ilist = ref (nil: tigerassem.instr list)
 	(* munchStm::Tree.stm -> unit *)
 	fun munchStm(SEQ(a, b)) = (munchStm a; munchStm b)(*primer stm*)
 	(*comenzamos por el final, para ir de los arboles mas simples a los mas complejos. Feli dice: no es al reves? Ir de los mas complejos a los mas simples?*)
+	|	munchStm (EXP(CALL (NAME n,args))) = (*Procedure*)
+			emit(OPER{assem="CALL "^n^"\n",
+						src=munchArgs (List.rev args),
+						dst=argregs,
+						jump=NONE})
+	|	munchStm (tigertree.MOVE(TEMP i,CALL (NAME n,args))) = (*Function call*)
+			(emit(OPER{assem="CALL "^n^"\n",
+						src=munchArgs (List.rev args),
+						dst=argregs,
+						jump=NONE});
+			emit(MOVE{assem = "MOV 'd0, 's0 \n",
+				  dst = i,
+				  src = rv}))
 	|   munchStm(tigertree.MOVE(TEMP i,BINOP(PLUS,MEM(CONST j),e1))) =  (*Por que esta este "MEM"? El pattern no deberia matchear mas bien con MOVE (TEMP i, BINOP(PLUS,CONST j, MEM(m))) ? *)
 		emit(MOVE{assem = "MOV 'd0, " ^(Int.toString j) ^ "['s0]\n", (*La forma no deberia ser MOV 'd0, j('s0)?*)
 			  dst = i,
@@ -101,11 +114,6 @@ let val ilist = ref (nil: tigerassem.instr list)
 			  jump = SOME [l1,l2]})
 	|   munchStm(tigertree.LABEL lab ) = 
 		emit(LABEL{assem = lab ^ ": \n", lab=lab }) 
-	|	munchStm (EXP(CALL (NAME n,args))) =
-			emit(OPER{assem="CALL "^n^"\n",
-						src=munchArgs(0,args),
-						dst=argregs,
-						jump=NONE})
 	|   munchStm(EXP(e)) = 
 		emit(MOVE{assem = "MOV 'd0, 's0 \n",
 			  dst = tigertemp.newtemp(),
@@ -144,8 +152,20 @@ let val ilist = ref (nil: tigerassem.instr list)
 	|    munchExp(TEMP t) = t
 	|	munchExp exp = result (fn r=>emit(OPER{assem="NADA: "^(ppEXP exp)^"\n",src=[], dst=[], jump=NONE}))
 
-	and munchArgs _ = []
-	     
+	and munchArgs [] = []
+		|munchArgs(arg::args) = let val temp = munchExp(arg)
+										in (case (getArgForPos (List.length args)) of
+														InReg reg => (emit(MOVE {assem = "MOV 'd0, 's0\n",
+																				dst = reg,
+																				src = temp})														
+																	;(reg :: munchArgs args))
+														|InFrame offset => (emit(OPER {assem = "PUSHQ 's0\n",
+																						dst = [],
+																						src = [temp],
+																						jump = NONE})
+																			;munchArgs args)
+	     											)
+									end
 
 in munchStm stm;
 	rev(!ilist)
