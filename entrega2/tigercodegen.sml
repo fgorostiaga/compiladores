@@ -126,25 +126,41 @@ let val ilist = ref (nil: tigerassem.instr list)
 			dst = [r],
 			jump = NONE})) 
 	|    munchExp(BINOP(MINUS,e1,e2)) =
-		result(fn r => emit(OPER{assem = "MOV 's0, 'd0\nSUB 's1, 'd0\n",
-			src = [munchExp(e1), munchExp(e2)],
-			dst = [r],
-			jump = NONE}))
+		result(fn r => (emit(MOVE{assem =  "MOV 's0, 'd0\n",
+			src = munchExp(e1),
+			dst = r
+			});
+			emit(OPER{assem = "SUB 's0, 'd0\n",
+				src = [munchExp(e2)],
+				dst = [r],
+				jump= NONE})))
 	|    munchExp(BINOP(DIV,e1,e2)) =
-		result(fn r => emit(OPER{assem =  "MOV 's0, 'd0\nDIV 's1, 'd0\n",
-			src = [munchExp(e1), munchExp(e2)],
-			dst = [r],
-			jump = NONE}))
+		result(fn r => (emit(MOVE{assem =  "MOV 's0, 'd0\n",
+			src = munchExp(e1),
+			dst = r
+			});
+			emit(OPER{assem = "DIV 's0, 'd0\n",
+				src = [munchExp(e2)],
+				dst = [r],
+				jump= NONE})))
 	|    munchExp(BINOP(MUL,e1,e2)) =
-		result(fn r => emit(OPER{assem =  "MOV 's0, 'd0\nMUL 's1, 'd0\n",
-			src = [munchExp(e1), munchExp(e2)],
-			dst = [r],
-			jump = NONE}))
+		result(fn r => (emit(MOVE{assem =  "MOV 's0, 'd0\n",
+			src = munchExp(e1),
+			dst = r
+			});
+			emit(OPER{assem = "MUL's0, 'd0\n",
+				src = [munchExp(e2)],
+				dst = [r],
+				jump= NONE})))
 	|    munchExp(BINOP(PLUS,e1,e2)) =
-		result(fn r => emit(OPER{assem =  "MOV 's0, 'd0\nADD 's1, 'd0\n",
-			src = [munchExp(e1), munchExp(e2)],
-			dst = [r],
-			jump = NONE})(*;emit.... *) )
+		result(fn r => (emit(MOVE{assem =  "MOV 's0, 'd0\n",
+			src = munchExp(e1),
+			dst = r
+			});
+			emit(OPER{assem = "ADD 's0, 'd0\n",
+				src = [munchExp(e2)],
+				dst = [r],
+				jump= NONE})))
 	|    munchExp(TEMP t) = t
 	|	munchExp (MEM e) = result (fn r=> emit(OPER{assem="MOV ['s0], 'd0\n",
 													dst = [r],
