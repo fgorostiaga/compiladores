@@ -21,10 +21,12 @@ val wSz : int
 val log2WSz : int
 val calldefs : tigertemp.temp list
 val callersaves : tigertemp.temp list
+val calleesaves : tigertemp.temp list
 val exp : access -> tigertree.exp
 val externalCall : string * tigertree.exp list -> tigertree.exp
 val procEntryExit1 : frame * tigertree.stm -> tigertree.stm
-(*val procEntryExit2 : frame * tigerassem.instr list -> tigerassem.instr list*)
+val procEntryExit2 : frame * tigerassem.instr list -> tigerassem.instr list
+val procEntryExit3 : frame * tigerassem.instr list -> {prolog:string, body:tigerassem.instr list, epilog:string}
 datatype frag = PROC of {body: tigertree.stm, frame: frame}
 	| STRING of tigertemp.label * string
 val getArgForPos : int -> access

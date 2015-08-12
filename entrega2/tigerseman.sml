@@ -460,7 +460,7 @@ fun transExp(venv, tenv) =
 			val _ = List.map print (List.map Ir (frags))
 			val _ = print "----------------\n"
 			val (a,b) = otroCanonizeFrag res
-			val assems = List.map (format (fn x=>x)) (List.concat ((List.map (fn x => codegen2 x) frags)))
+			val assems = List.map (format (fn x=>x)) (codegen2 frags)
 			val _ = List.map print assems
 			val _ = tigerinterp.inter false a b
 		in	print "bien!\n" end

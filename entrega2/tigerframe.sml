@@ -96,4 +96,15 @@ fun exp(InFrame k) = MEM(BINOP(PLUS, TEMP(fp), CONST k)) (*Deberia usar el e?*)
 fun externalCall(s, l) = CALL(NAME s, l)
 
 fun procEntryExit1 (frame,body) = body
+
+fun procEntryExit2 (frame,body) = body @ [tigerassem.OPER {assem = "",
+															src = [rv]@calleesaves,
+															dst = [],
+															jump = SOME[] }]
+
+fun procEntryExit3 ({name, ...}:frame, body) = (*No se donde ni cuando se usa esto*)
+	{prolog = "PROCEDURE "^name^" \n",
+	body = body,
+	epilog = "END "^name^"\n"}
+
 end

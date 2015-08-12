@@ -3,7 +3,7 @@ open tigertree
 open tigerassem
 open tigerframe
 
-fun codegen2 frags =
+fun codegen2 fragss =
 
 let fun codegen (stm: tigertree.stm) : tigerassem.instr list =  (*Saque el argumento frame porque tenemos FP. Referirse a pagina 206 del Appel para mas detalles. Gracias, vuelva prontos.*)
 
@@ -144,7 +144,7 @@ let val ilist = ref (nil: tigerassem.instr list)
 		result(fn r => emit(OPER{assem =  "MOV 's0, 'd0\nADD 's1, 'd0\n",
 			src = [munchExp(e1), munchExp(e2)],
 			dst = [r],
-			jump = NONE})  )
+			jump = NONE})(*;emit.... *) )
 	|    munchExp(TEMP t) = t
 	|	munchExp (MEM e) = result (fn r=> emit(OPER{assem="MOV ['s0], 'd0\n",
 													dst = [r],
@@ -177,6 +177,11 @@ end
 		fun aux2(PROC{body, frame}) = codegen body
 		| aux2(STRING(l, "")) = [(LABEL{assem = l ^ ": \n", lab=l })]
 		| aux2(STRING(l, s)) = [(LABEL{assem = l^":\n\t.string \""^s^"\"\n", lab=l })]
+		fun aux [] = []
+			|aux (x::xs) = aux2 x @ aux xs
 		fun aux3 [] = []
-		| aux3(h::t) = (aux2 h)@(aux3 t)
-	in	aux3 frags end
+		| aux3(h::t) = (case h of
+								(PROC {body,frame} :: instrs) => procEntryExit2 (frame,aux h) @ aux3 t
+								|_ => aux h @ aux3 t
+							)
+	in	aux3 fragss end
