@@ -179,7 +179,7 @@ let val ilist = ref (nil: tigerassem.instr list)
 																				dst = reg,
 																				src = temp})														
 																	;(reg :: munchArgs args))
-														|InFrame offset => (emit(OPER {assem = "PUSHQ 's0\n", (*medio hack*)
+														|InFrame _ => (emit(OPER {assem = "PUSHQ 's0\n", (*medio hack*)
 																						dst = [],
 																						src = [temp],
 																						jump = NONE})
@@ -192,7 +192,8 @@ in munchStm stm;
 end
 		fun aux2(PROC{body, frame}) = codegen body
 		| aux2(STRING(l, "")) = [(LABEL{assem = l ^ ": \n", lab=l })]
-		| aux2(STRING(l, s)) = [(LABEL{assem = l^":\n\t.string \""^s^"\"\n", lab=l })]
+		| aux2(STRING("", s)) = [(LABEL{assem = "\t"^s ^ "\n", lab="NINGUN LABEL" })]
+		| aux2(STRING(l, s)) = [(LABEL{assem = l^":\n\t"^s^"\n", lab=l })]
 		fun aux [] = []
 			|aux (x::xs) = aux2 x @ aux xs
 		fun aux3 [] = []
