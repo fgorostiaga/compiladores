@@ -6,6 +6,7 @@ open tigersres
 open tigertrans
 open tigercodegen
 open tigerassem
+open tigermakegraph
 
 type expty = {exp: unit, ty: Tipo}
 
@@ -460,8 +461,10 @@ fun transExp(venv, tenv) =
 			val _ = List.map print (List.map Ir (frags))
 			val _ = print "----------------\n"
 			val (a,b) = otroCanonizeFrag res
-			val assems = List.map (format (fn x=>x)) (codegen2 frags)
+			val instrs = codegen2 frags
+			val assems = List.map (format (fn x=>x)) instrs
 			val _ = List.map print assems
+			val _ = tigermakegraph.instrs2graph instrs
 			val _ = tigerinterp.inter false a b
 		in	print "bien!\n" end
 	end

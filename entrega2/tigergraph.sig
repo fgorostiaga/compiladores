@@ -15,8 +15,7 @@ sig
 	val mk_edge : {from:node, to:node} -> unit
 	val rm_edge : {from:node, to:node} -> unit
 
-	structure Table : TABLE
-	sharing type Table.key = node
+	type 'a Table = (node, 'a) tigertab.Tabla
 
 	val nodename : node -> string (*For debugging*)
 end
