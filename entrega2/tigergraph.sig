@@ -16,6 +16,7 @@ sig
 	val rm_edge : {from:node, to:node} -> unit
 
 	type 'a Table = (node, 'a) tigertab.Tabla
+	val tabNueva : unit -> (node, 'a) tigertab.Tabla
 
 	val nodename : node -> string (*For debugging*)
 end

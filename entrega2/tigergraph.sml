@@ -59,4 +59,6 @@ fun rm_edge {from=(n0,rgr0), to=(n1,rgr1)} = let val _ = if rgr0 = rgr1 then () 
 
 type 'a Table = (node, 'a) tigertab.Tabla
 
+fun tabNueva () = tigertab.tabNueva ()
+
 fun nodename node = "" (*For debugging*)
