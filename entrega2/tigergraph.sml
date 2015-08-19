@@ -1,7 +1,7 @@
 open Splayset
 type noderep = string
-type graph = (noderep set * noderep * noderep set) set (*{preds}, noderep, {succs}*)
-type node = noderep * graph ref 
+type graph = (noderep set * noderep * noderep set) set ref (*{preds}, noderep, {succs}*)
+type node = noderep * graph
 
 val emptystringset = empty String.compare
 
@@ -15,7 +15,7 @@ fun getnode noderep grafo = (case peek (grafo, (emptystringset, noderep, emptyst
 												NONE => raise Fail "no existia el nodo"
 												|SOME m=>m)
 
-fun nodes graph = foldl (fn ((_,n,_),ns) => ((n, ref graph)::ns)) [] graph
+fun nodes graph = foldl (fn ((_,n,_),ns) => ((n, graph)::ns)) [] (!graph)
 fun succ (n, rgr) = let val grafo = !rgr
 						val (_, _, succ) = getnode n grafo
 						val theList = List.map (fn n => (n,rgr)) (listItems succ)
@@ -30,9 +30,11 @@ fun adj (n, rgr) = let val grafo = !rgr
 						in theList end
 fun eq ((n0,rgr0), (n1,rgr1)) = String.compare (n0, n1) = EQUAL andalso rgr0 = rgr1
 
-fun newGraph () = empty (fn ((_,n0,_),(_,n1,_)) => String.compare (n0, n1))
+fun newGraph () = ref (empty (fn ((_,n0,_),(_,n1,_)) => String.compare (n0, n1)))
 
-fun newNode graph = (nextnode (), ref graph)
+fun newNode graph = let val node = nextnode ()
+						val _ = graph := add(!graph, (emptystringset, node, emptystringset))
+					in (node, graph) end
 exception GraphEdge
 fun mk_edge {from=(n0,rgr0), to=(n1,rgr1)} = let val _ = if rgr0 = rgr1 then () else raise Fail "Grafos distintos"
 												val (p,_,s) = getnode n0 (!rgr0)

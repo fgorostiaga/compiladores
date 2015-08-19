@@ -1,7 +1,7 @@
 signature tigergraph =
 sig
 	type graph
-	type node
+	eqtype node
 
 	val nodes : graph -> node list
 	val succ : node -> node list
