@@ -131,7 +131,7 @@ let val ilist = ref (nil: tigerassem.instr list)
 			dst = r
 			});
 			emit(OPER{assem = "SUB 's0, 'd0\n",
-				src = [munchExp(e2)],
+				src = [munchExp(e2),r],
 				dst = [r],
 				jump= NONE})))
 	|    munchExp(BINOP(DIV,e1,e2)) =
@@ -140,7 +140,7 @@ let val ilist = ref (nil: tigerassem.instr list)
 			dst = r
 			});
 			emit(OPER{assem = "DIV 's0, 'd0\n",
-				src = [munchExp(e2)],
+				src = [munchExp(e2),r],
 				dst = [r],
 				jump= NONE})))
 	|    munchExp(BINOP(MUL,e1,e2)) =
@@ -149,7 +149,7 @@ let val ilist = ref (nil: tigerassem.instr list)
 			dst = r
 			});
 			emit(OPER{assem = "MUL's0, 'd0\n",
-				src = [munchExp(e2)],
+				src = [munchExp(e2),r],
 				dst = [r],
 				jump= NONE})))
 	|    munchExp(BINOP(PLUS,e1,e2)) =
@@ -158,7 +158,7 @@ let val ilist = ref (nil: tigerassem.instr list)
 			dst = r
 			});
 			emit(OPER{assem = "ADD 's0, 'd0\n",
-				src = [munchExp(e2)],
+				src = [munchExp(e2),r],
 				dst = [r],
 				jump= NONE})))
 	|    munchExp(TEMP t) = t

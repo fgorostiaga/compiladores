@@ -7,6 +7,7 @@ open tigertrans
 open tigercodegen
 open tigerassem
 open tigermakegraph
+open tigerliveness
 
 type expty = {exp: unit, ty: Tipo}
 
@@ -465,7 +466,10 @@ fun transExp(venv, tenv) =
 			val assems = List.map (format (fn x=>x)) instrs
 			val _ = List.map print assems
 			val (fgraph,nodes) = tigermakegraph.instrs2graph instrs
-			val _ = (print ("Nodes:\n"); (List.map (fn x=> print (tigergraph.nodename x^", ")) nodes))
+			val (insarray, outsarray) = livenessAnalisis (fgraph, nodes)
+			val _ = Array.appi (fn (i, temps) => (print ("\nLiveins at node "^Int.toString(i)^": "); Splayset.app(fn t=>print (t^", ")) temps)) insarray
+			val _ = Array.appi (fn (i, temps) => (print ("\nLiveouts at node "^Int.toString(i)^": "); Splayset.app(fn t=>print (t^", ")) temps)) outsarray
+			(*val _ = (print ("Nodes:\n"); (List.map (fn x=> print (tigergraph.nodename x^", ")) nodes))*)
 			(*val _ = tigerinterp.inter false a b*)
 		in	print "bien!\n" end
 	end

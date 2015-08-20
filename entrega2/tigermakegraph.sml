@@ -27,7 +27,6 @@ fun instrs2graph inss =
 														| [] => raise Fail ("SOME 0 jumps. Assem: "^assem)
 														| _ => raise Fail "More than 2 jumps? Not on MY watch.")
 						val nodelist = (mynode :: nodelist)
-						val _ = print ("added node: "^(nodename mynode))
 						val def = tabRInserta (mynode, dst, def)
 						val use = tabRInserta (mynode, src, use)
 						val ismove = tabRInserta (mynode, false, ismove)
