@@ -63,4 +63,4 @@ type 'a Table = (node, 'a) tigertab.Tabla
 
 fun tabNueva () = tigertab.tabNueva ()
 
-fun nodename node = "" (*For debugging*)
+fun nodename (noderep,_) = noderep (*For debugging*)

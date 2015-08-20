@@ -464,7 +464,8 @@ fun transExp(venv, tenv) =
 			val instrs = codegen2 frags
 			val assems = List.map (format (fn x=>x)) instrs
 			val _ = List.map print assems
-			val _ = tigermakegraph.instrs2graph instrs
-			val _ = tigerinterp.inter false a b
+			val (fgraph,nodes) = tigermakegraph.instrs2graph instrs
+			val _ = (print ("Nodes:\n"); (List.map (fn x=> print (tigergraph.nodename x^", ")) nodes))
+			(*val _ = tigerinterp.inter false a b*)
 		in	print "bien!\n" end
 	end
