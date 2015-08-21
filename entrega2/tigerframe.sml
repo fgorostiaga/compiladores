@@ -97,7 +97,7 @@ fun externalCall(s, l) = CALL(NAME s, l)
 
 fun procEntryExit1 (frame,body) = body
 
-fun procEntryExit2 (frame,body) = body @ [tigerassem.OPER {assem = "",
+fun procEntryExit2 (frame,body) = body @ [tigerassem.OPER {assem = "heres a node too\n",
 															src = [rv]@calleesaves,
 															dst = [],
 															jump = NONE }]
