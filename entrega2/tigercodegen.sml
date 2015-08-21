@@ -41,9 +41,10 @@ let val ilist = ref (nil: tigerassem.instr list)
 			  dst = i,
 			  src = munchExp(e1)}) 
 	|   munchStm(tigertree.MOVE(MEM e0, e1)) =
-		emit(MOVE{assem = "MOV ('s0), 'd0 \n",
-			  dst = munchExp e1,
-			  src = munchExp e0}) 
+		let val d0 = munchExp e0 in emit(OPER{assem = "MOV 's0, ('d0) \n",
+			  dst = [d0],
+			  src = [munchExp e1,d0],
+			  jump = NONE}) end
 	|   munchStm(JUMP(NAME e,lls)) =	
 		emit(OPER{assem = "JMP 'j0 \n",
 			  dst = [],
