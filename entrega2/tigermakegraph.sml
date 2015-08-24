@@ -64,7 +64,7 @@ fun instrs2graph inss =
 					end
 in
 	aux (FGRAPH {control = newGraph (),
-				def = tabNueva (),
-				use= tabNueva (),
-				ismove= tabNueva ()}) [] inss (tigertab.tabNueva ()) NONE
+				def = nodeTabNueva (),
+				use= nodeTabNueva (),
+				ismove= nodeTabNueva ()}) [] inss (tabNueva ()) NONE
 end

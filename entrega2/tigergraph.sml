@@ -30,6 +30,8 @@ fun adj (n, rgr) = let val grafo = !rgr
 						in theList end
 fun eq ((n0,rgr0), (n1,rgr1)) = String.compare (n0, n1) = EQUAL andalso rgr0 = rgr1
 
+fun compare ((n0,rgr0), (n1,rgr1)) = if eq((n0,rgr0), (n1,rgr1)) then EQUAL else if n0<n1 then LESS else if n0>n1 then GREATER else raise Fail "me estas comparando dos nodos de grafos distintos.."
+
 fun newGraph () = ref (empty (fn ((_,n0,_),(_,n1,_)) => String.compare (n0, n1)))
 
 fun newNode graph = let val node = nextnode ()
@@ -61,6 +63,6 @@ fun rm_edge {from=(n0,rgr0), to=(n1,rgr1)} = let val _ = if rgr0 = rgr1 then () 
 
 type 'a Table = (node, 'a) tigertab.Tabla
 
-fun tabNueva () = tigertab.tabNueva ()
+fun nodeTabNueva () = tigertab.tabNueva ()
 
 fun nodename (noderep,_) = noderep (*For debugging*)
