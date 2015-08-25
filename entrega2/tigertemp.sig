@@ -4,4 +4,5 @@ signature tigertemp = sig
 	val makeString: string -> string
 	val newtemp: unit -> temp
 	val newlabel: unit -> label
+	val lastTempIndex: unit -> int
 end
