@@ -16,6 +16,7 @@ val coalescedNodes = ref (empty String.compare)
 val spillWorklist = ref (empty String.compare)
 val freezeWorklist = ref (empty String.compare)
 val simplifyWorklist = ref (empty String.compare)
+val alias = ref (tabNueva())
 val precolored = [tigerframe.fp]
 val k = 5
 
@@ -38,6 +39,7 @@ fun addEdge(u,v) =
 	)
 
 
+fun findInTab(x,tab) = case tabBusca(x,tab) of SOME s=>addList(empty String.compare,s) | NONE => raise Fail "Nodo no encontrado"
 fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 	let
 		val _ = adjSet := (empty (fn ((u0,v0),(u1,v1)) => if u0=u1 then String.compare(v0,v1) else String.compare(u0,u1)))
@@ -48,8 +50,8 @@ fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 		val _ = activeMoves := (empty compare)
 		val _ = selectStack := []
 		val _ = coalescedNodes := (empty String.compare)
+		val _ = alias := (tabNueva())
 
-		fun findInTab(x,tab) = case tabBusca(x,tab) of SOME s=>addList(empty String.compare,s) | NONE => raise Fail "Nodo no encontrado"
 
 		fun aux [] moveList worklistMoves _ = (moveList, worklistMoves)
 			|aux (instr :: rest) moveList worklistMoves i =
@@ -100,6 +102,16 @@ fun simplify () = let val wlist = listItems(!simplifyWorklist)
 												in aux rest end
 						in aux wlist end
 
+fun getAlias n = if member(!coalescedNodes,n) then getAlias (case tabBusca(n,!alias) of SOME x=>x|NONE=>raise Fail "nnf") else n
+
+fun coalesce (FGRAPH {control, def, use, ismove}) = let val wlist = listItems (!worklistMoves)
+						val _ = worklistMoves := empty compare
+						fun aux [] = ()
+							|aux (m :: rest) = let val x = getAlias (List.hd (case tabBusca(m,use) of SOME x=>x|NONE=>raise Fail "node not found"))
+													val y = getAlias (List.hd (case tabBusca(m,def) of SOME x=>x|NONE=>raise Fail "node not found"))
+												in aux rest end
+						in aux wlist end
+
 fun main fgraph nodes = 
 	let val (insarray, outsarray) = livenessAnalisis (fgraph, nodes)
 		val (a,b) = build fgraph nodes outsarray
@@ -108,7 +120,9 @@ fun main fgraph nodes =
 		val _ = (spillWorklist := a; freezeWorklist :=b; simplifyWorklist:=c)
 		fun iterate () = if isEmpty(!simplifyWorklist) andalso isEmpty(!worklistMoves) andalso isEmpty(!freezeWorklist) andalso isEmpty(!spillWorklist) then () else (
             if not (isEmpty(!simplifyWorklist)) then simplify ()
-            else ()
+            else if not (isEmpty(!worklistMoves)) then coalesce fgraph
+			else ()
+			(*; iterate ()*)
           )
 		val _ = iterate ()
 	in (insarray,outsarray, !adjList) end
