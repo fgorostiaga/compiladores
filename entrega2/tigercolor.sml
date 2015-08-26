@@ -11,6 +11,8 @@ val degree : (tigertemp.temp , int) Tabla ref = ref (tabNueva ())
 val moveList = ref (tabNueva())
 val worklistMoves = ref (empty compare)
 val activeMoves = ref (empty compare)
+val selectStack = ref []
+val coalescedNodes = ref (empty String.compare)
 val spillWorklist = ref (empty String.compare)
 val freezeWorklist = ref (empty String.compare)
 val simplifyWorklist = ref (empty String.compare)
@@ -44,6 +46,8 @@ fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 		val _ = moveList := (tabNueva())
 		val _ = worklistMoves := (empty compare)
 		val _ = activeMoves := (empty compare)
+		val _ = selectStack := []
+		val _ = coalescedNodes := (empty String.compare)
 
 		fun findInTab(x,tab) = case tabBusca(x,tab) of SOME s=>addList(empty String.compare,s) | NONE => raise Fail "Nodo no encontrado"
 
@@ -83,12 +87,28 @@ fun makeWorklist () = let val initial = tigerframe.argregs @ (tigerframe.fp :: L
 									in aux rest (spwl,fwl,siwl) end
 							in aux initial (empty String.compare,empty String.compare,empty String.compare) end
 
+fun adjacent n = let val adjlistn = case tabBusca(n,!adjList) of SOME x => x |NONE => raise Fail "node not found"
+  					in difference(adjlistn,addList(!coalescedNodes,!selectStack)) end
+
+fun decrementdegree m = ()
+
+fun simplify () = let val wlist = listItems(!simplifyWorklist)
+  						val _ = simplifyWorklist := empty String.compare
+  						fun aux [] = ()
+						  |aux (n :: rest) = let val _ = selectStack := (n :: !selectStack)
+						  							val _ = app (fn m => decrementdegree m) (adjacent n)
+												in aux rest end
+						in aux wlist end
+
 fun main fgraph nodes = 
 	let val (insarray, outsarray) = livenessAnalisis (fgraph, nodes)
 		val (a,b) = build fgraph nodes outsarray
 		val _ = (moveList := a; worklistMoves := b)
 		val (a, b, c) = makeWorklist ()
 		val _ = (spillWorklist := a; freezeWorklist :=b; simplifyWorklist:=c)
-		fun iterate () = if isEmpty(!simplifyWorklist) andalso isEmpty(!worklistMoves) andalso isEmpty(!freezeWorklist) andalso isEmpty(!spillWorklist) then () else ()
+		fun iterate () = if isEmpty(!simplifyWorklist) andalso isEmpty(!worklistMoves) andalso isEmpty(!freezeWorklist) andalso isEmpty(!spillWorklist) then () else (
+            if not (isEmpty(!simplifyWorklist)) then simplify ()
+            else ()
+          )
 		val _ = iterate ()
 	in (insarray,outsarray, !adjList) end
