@@ -11,6 +11,7 @@ val degree : (tigertemp.temp , int) Tabla ref = ref (tabNueva ())
 val moveList = ref (tabNueva())
 val worklistMoves = ref (empty compare)
 val activeMoves = ref (empty compare)
+val constrainedMoves = ref (empty compare)
 val selectStack = ref []
 val coalescedNodes = ref (empty String.compare)
 val spillWorklist = ref (empty String.compare)
@@ -48,6 +49,7 @@ fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 		val _ = moveList := (tabNueva())
 		val _ = worklistMoves := (empty compare)
 		val _ = activeMoves := (empty compare)
+		val _ = constrainedMoves := (empty compare)
 		val _ = selectStack := []
 		val _ = coalescedNodes := (empty String.compare)
 		val _ = alias := (tabNueva())
@@ -104,11 +106,19 @@ fun simplify () = let val wlist = listItems(!simplifyWorklist)
 
 fun getAlias n = if member(!coalescedNodes,n) then getAlias (case tabBusca(n,!alias) of SOME x=>x|NONE=>raise Fail "nnf") else n
 
+fun addWorklist u =
+	if not (listmember u precolored) andalso not (moveRelated u andalso (tabBuscaDefaults (!degree, u, 0) < k)) then
+		(freezeWorklist := delete(!freezeWorklist,u);
+		simplifyWorklist := delete(!simplifyWorklist,u)) else ()
+
 fun coalesce (FGRAPH {control, def, use, ismove}) = let val wlist = listItems (!worklistMoves)
 						val _ = worklistMoves := empty compare
 						fun aux [] = ()
 							|aux (m :: rest) = let val x = getAlias (List.hd (case tabBusca(m,use) of SOME x=>x|NONE=>raise Fail "node not found"))
 													val y = getAlias (List.hd (case tabBusca(m,def) of SOME x=>x|NONE=>raise Fail "node not found"))
+													val (u,v) = if listmember y precolored then (y,x) else (x,y)
+													val _ = if (u=v) then (add(!constrainedMoves,m);addWorklist(u)) else ()
+													
 												in aux rest end
 						in aux wlist end
 
