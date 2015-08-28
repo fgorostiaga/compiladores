@@ -12,6 +12,7 @@ val moveList = ref (tabNueva())
 val worklistMoves = ref (empty compare)
 val activeMoves = ref (empty compare)
 val constrainedMoves = ref (empty compare)
+val coalescedMoves = ref (empty compare)
 val selectStack = ref []
 val coalescedNodes = ref (empty String.compare)
 val spillWorklist = ref (empty String.compare)
@@ -50,6 +51,7 @@ fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 		val _ = worklistMoves := (empty compare)
 		val _ = activeMoves := (empty compare)
 		val _ = constrainedMoves := (empty compare)
+		val _ = coalescedMoves := (empty compare)
 		val _ = selectStack := []
 		val _ = coalescedNodes := (empty String.compare)
 		val _ = alias := (tabNueva())
@@ -111,16 +113,38 @@ fun addWorklist u =
 		(freezeWorklist := delete(!freezeWorklist,u);
 		simplifyWorklist := delete(!simplifyWorklist,u)) else ()
 
+fun ok(t,r) = let val degreet = case tabBusca(t,!degree) of SOME x=>x|NONE=>raise Fail "Nnf"
+					in degreet < k orelse listmember t precolored orelse member(!adjSet,(t,r)) end
+
+fun conservative nodes = let
+							fun aux [] x = x
+								|aux (n::rest) x = let val degreen = case tabBusca(n,!degree) of SOME x=>x|NONE=>raise Fail "Nnf"
+														val x = if degreen<k then x else x+1
+														in aux rest x end
+							in aux (listItems nodes) 0 < k end
+fun combine _ = ()
+
 fun coalesce (FGRAPH {control, def, use, ismove}) = let val wlist = listItems (!worklistMoves)
 						val _ = worklistMoves := empty compare
 						fun aux [] = ()
 							|aux (m :: rest) = let val x = getAlias (List.hd (case tabBusca(m,use) of SOME x=>x|NONE=>raise Fail "node not found"))
 													val y = getAlias (List.hd (case tabBusca(m,def) of SOME x=>x|NONE=>raise Fail "node not found"))
 													val (u,v) = if listmember y precolored then (y,x) else (x,y)
-													val _ = if (u=v) then (add(!constrainedMoves,m);addWorklist(u)) else ()
-													
+													val _ = if (u=v) then
+																(coalescedMoves:=add(!coalescedMoves,m);addWorklist(u))
+															else if listmember v precolored orelse member(!adjSet, (u,v)) then
+																(constrainedMoves := add(!constrainedMoves,m);
+																addWorklist(u);addWorklist(v))
+															else if (listmember u precolored andalso (foldl (fn (t,b) => b andalso (ok(t,u))) true (adjacent v)))
+																	orelse (not (listmember u precolored) andalso (conservative(union(adjacent(u),adjacent(v))))) then
+																(coalescedMoves := add(!coalescedMoves,m);
+																combine(u,v);
+																addWorklist(u))
+															else
+																activeMoves:=add(!activeMoves,m)
 												in aux rest end
 						in aux wlist end
+
 
 fun main fgraph nodes = 
 	let val (insarray, outsarray) = livenessAnalisis (fgraph, nodes)
