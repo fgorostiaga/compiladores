@@ -150,7 +150,7 @@ fun combine (u,v) = (if member(!freezeWorklist,v) then
 						moveList := tabRInserta(u,union(moveListu,moveListv), !moveList) end;
 					enableMoves(singleton String.compare v);
 					app (fn t => (addEdge(t,u); decrementdegree(t))) (adjacent v);
-					let val degreeu = case tabBusca(u,!degree) of SOME x=>x | NONE => raise Fail "nnencontrado" in
+					let val degreeu = tabBuscaDefaults(!degree,u,0) in
 					if degreeu >= k andalso member(!freezeWorklist,u) then
 						(freezeWorklist := safeDelete(!freezeWorklist,u);
 						spillWorklist := add(!spillWorklist,u))
