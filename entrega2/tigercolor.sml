@@ -96,7 +96,14 @@ fun makeWorklist () = let val initial = tigerframe.argregs @ (tigerframe.fp :: L
 fun adjacent n = let val adjlistn = case tabBusca(n,!adjList) of SOME x => x |NONE => raise Fail "node not found"
   					in difference(adjlistn,addList(!coalescedNodes,!selectStack)) end
 
-fun decrementdegree m = ()
+fun decrementdegree m = let val d = case tabBusca(m,!degree) of SOME x => x | NONE => raise Fail "Nodo no encontrado"
+							val _ = degree := tabRInserta(m,d-1,!degree)
+							in if d = k then (
+							()
+							) else ()
+							end
+
+fun enableMoves nodes = app (fn n => app (fn m => if member(!activeMoves,m) then (activeMoves:=delete(!activeMoves,m);worklistMoves:=add(!worklistMoves,m)) else ()) (nodeMoves n)) nodes
 
 fun simplify () = let val wlist = listItems(!simplifyWorklist)
   						val _ = simplifyWorklist := empty String.compare
@@ -122,7 +129,24 @@ fun conservative nodes = let
 														val x = if degreen<k then x else x+1
 														in aux rest x end
 							in aux (listItems nodes) 0 < k end
-fun combine _ = ()
+fun combine (u,v) = (if member(!freezeWorklist,v) then
+						freezeWorklist := delete(!freezeWorklist,v)
+					else
+						spillWorklist := delete(!spillWorklist,v);
+					coalescedNodes := add(!coalescedNodes,v);
+					alias:=tabRInserta(v,u,!alias);
+					let val moveListu = case tabBusca(u,!moveList) of SOME x=>x | NONE=>raise Fail "nodo no encontrado"
+						val moveListv = case tabBusca(v,!moveList) of SOME x=>x | NONE=>raise Fail "nodo no encontrado"
+					in
+						moveList := tabRInserta(u,union(moveListu,moveListv), !moveList) end;
+					enableMoves(add(empty String.compare,v));
+					app (fn t => (addEdge(t,u); decrementdegree(t))) (adjacent v);
+					let val degreeu = case tabBusca(u,!degree) of SOME x=>x | NONE => raise Fail "nnencontrado" in
+					if degreeu >= k andalso member(!freezeWorklist,u) then
+						(freezeWorklist := delete(!freezeWorklist,u);
+						spillWorklist := add(!spillWorklist,u))
+					else () end)
+
 
 fun coalesce (FGRAPH {control, def, use, ismove}) = let val wlist = listItems (!worklistMoves)
 						val _ = worklistMoves := empty compare
