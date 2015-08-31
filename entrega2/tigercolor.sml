@@ -96,14 +96,19 @@ fun makeWorklist () = let val initial = tigerframe.argregs @ (tigerframe.fp :: L
 fun adjacent n = let val adjlistn = case tabBusca(n,!adjList) of SOME x => x |NONE => raise Fail "node not found"
   					in difference(adjlistn,addList(!coalescedNodes,!selectStack)) end
 
+fun enableMoves nodes = app (fn n => app (fn m => if member(!activeMoves,m) then (activeMoves:=delete(!activeMoves,m);worklistMoves:=add(!worklistMoves,m)) else ()) (nodeMoves n)) nodes
+
 fun decrementdegree m = let val d = case tabBusca(m,!degree) of SOME x => x | NONE => raise Fail "Nodo no encontrado"
 							val _ = degree := tabRInserta(m,d-1,!degree)
 							in if d = k then (
-							()
+							enableMoves (add(adjacent m,m));
+							spillWorklist := delete(!spillWorklist,m);
+							if moveRelated m then
+								freezeWorklist := add(!freezeWorklist,m)
+							else
+								simplifyWorklist := add(!simplifyWorklist,m)
 							) else ()
 							end
-
-fun enableMoves nodes = app (fn n => app (fn m => if member(!activeMoves,m) then (activeMoves:=delete(!activeMoves,m);worklistMoves:=add(!worklistMoves,m)) else ()) (nodeMoves n)) nodes
 
 fun simplify () = let val wlist = listItems(!simplifyWorklist)
   						val _ = simplifyWorklist := empty String.compare
