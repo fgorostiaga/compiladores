@@ -11,6 +11,7 @@ val degree : (tigertemp.temp , int) Tabla ref = ref (tabNueva ())
 val moveList = ref (tabNueva())
 val worklistMoves = ref (empty compare)
 val activeMoves = ref (empty compare)
+val frozenMoves = ref (empty compare)
 val constrainedMoves = ref (empty compare)
 val coalescedMoves = ref (empty compare)
 val selectStack = ref []
@@ -21,6 +22,7 @@ val simplifyWorklist = ref (empty String.compare)
 val alias = ref (tabNueva())
 val precolored = [tigerframe.fp]
 val k = 5
+
 
 fun listmember _ [] = false
 	|listmember x (y::rest) = if x=y then true else listmember x rest
@@ -50,6 +52,7 @@ fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 		val _ = moveList := (tabNueva())
 		val _ = worklistMoves := (empty compare)
 		val _ = activeMoves := (empty compare)
+		val _ = frozenMoves := (empty compare)
 		val _ = constrainedMoves := (empty compare)
 		val _ = coalescedMoves := (empty compare)
 		val _ = selectStack := []
@@ -93,7 +96,7 @@ fun makeWorklist () = let val initial = tigerframe.argregs @ (tigerframe.fp :: L
 									in aux rest (spwl,fwl,siwl) end
 							in aux initial (empty String.compare,empty String.compare,empty String.compare) end
 
-fun adjacent n = let val adjlistn = case tabBusca(n,!adjList) of SOME x => x |NONE => raise Fail "node not found"
+fun adjacent n = let val adjlistn = tabBuscaDefaults(!adjList,n, empty String.compare)
   					in difference(adjlistn,addList(!coalescedNodes,!selectStack)) end
 
 fun enableMoves nodes = app (fn n => app (fn m => if member(!activeMoves,m) then (activeMoves:=delete(!activeMoves,m);worklistMoves:=add(!worklistMoves,m)) else ()) (nodeMoves n)) nodes
@@ -144,7 +147,7 @@ fun combine (u,v) = (if member(!freezeWorklist,v) then
 						val moveListv = case tabBusca(v,!moveList) of SOME x=>x | NONE=>raise Fail "nodo no encontrado"
 					in
 						moveList := tabRInserta(u,union(moveListu,moveListv), !moveList) end;
-					enableMoves(add(empty String.compare,v));
+					enableMoves(singleton String.compare v);
 					app (fn t => (addEdge(t,u); decrementdegree(t))) (adjacent v);
 					let val degreeu = case tabBusca(u,!degree) of SOME x=>x | NONE => raise Fail "nnencontrado" in
 					if degreeu >= k andalso member(!freezeWorklist,u) then
@@ -174,6 +177,36 @@ fun coalesce (FGRAPH {control, def, use, ismove}) = let val wlist = listItems (!
 												in aux rest end
 						in aux wlist end
 
+fun freezeMoves u (FGRAPH {control, def, use, ismove}) =
+	let fun aux m = let val x = List.hd (case tabBusca(m,use) of SOME x=>x|NONE=>raise Fail "node not found")
+						val y = List.hd (case tabBusca(m,def) of SOME x=>x|NONE=>raise Fail "node not found")
+						val v = if (getAlias y) = (getAlias u) then getAlias x else getAlias y
+						val degreev = case tabBusca(v,!degree) of SOME x=>x | NONE => raise Fail "nnencontrado"
+					in
+						(activeMoves := delete(!activeMoves,m);
+						frozenMoves := add(!frozenMoves,m);
+						if isEmpty(nodeMoves v) andalso degreev < k then
+							(freezeWorklist := add(!freezeWorklist,v);
+							simplifyWorklist := add(!simplifyWorklist,v))
+						else ())
+					end
+		in app aux (nodeMoves u) end
+
+
+fun freeze graph = let val u = List.hd (listItems (!freezeWorklist))
+						in (
+							freezeWorklist := delete(!freezeWorklist,u);
+							simplifyWorklist := add(!simplifyWorklist,u);
+							freezeMoves u graph)
+						end
+
+fun selectSpill graph = let val m = List.hd (listItems (!freezeWorklist)) (*deberia usar una heuristica copada*)
+						in
+							(spillWorklist := delete(!spillWorklist,m);
+							simplifyWorklist := add(!simplifyWorklist,m);
+							freezeMoves m graph)
+						end
+	
 
 fun main fgraph nodes = 
 	let val (insarray, outsarray) = livenessAnalisis (fgraph, nodes)
@@ -184,8 +217,9 @@ fun main fgraph nodes =
 		fun iterate () = if isEmpty(!simplifyWorklist) andalso isEmpty(!worklistMoves) andalso isEmpty(!freezeWorklist) andalso isEmpty(!spillWorklist) then () else (
             if not (isEmpty(!simplifyWorklist)) then simplify ()
             else if not (isEmpty(!worklistMoves)) then coalesce fgraph
-			else ()
-			(*; iterate ()*)
+            else if not (isEmpty(!freezeWorklist)) then freeze fgraph
+			else selectSpill fgraph 
+			; iterate ()
           )
 		val _ = iterate ()
 	in (insarray,outsarray, !adjList) end
