@@ -23,6 +23,7 @@ val alias = ref (tabNueva())
 val precolored = [tigerframe.fp]
 val k = 5
 
+fun safeDelete(s,i) = if member(s,i) then delete(s,i) else s
 
 fun listmember _ [] = false
 	|listmember x (y::rest) = if x=y then true else listmember x rest
@@ -99,13 +100,13 @@ fun makeWorklist () = let val initial = tigerframe.argregs @ (tigerframe.fp :: L
 fun adjacent n = let val adjlistn = tabBuscaDefaults(!adjList,n, empty String.compare)
   					in difference(adjlistn,addList(!coalescedNodes,!selectStack)) end
 
-fun enableMoves nodes = app (fn n => app (fn m => if member(!activeMoves,m) then (activeMoves:=delete(!activeMoves,m);worklistMoves:=add(!worklistMoves,m)) else ()) (nodeMoves n)) nodes
+fun enableMoves nodes = app (fn n => app (fn m => if member(!activeMoves,m) then (activeMoves:=safeDelete(!activeMoves,m);worklistMoves:=add(!worklistMoves,m)) else ()) (nodeMoves n)) nodes
 
 fun decrementdegree m = let val d = case tabBusca(m,!degree) of SOME x => x | NONE => raise Fail "Nodo no encontrado"
 							val _ = degree := tabRInserta(m,d-1,!degree)
 							in if d = k then (
 							enableMoves (add(adjacent m,m));
-							spillWorklist := delete(!spillWorklist,m);
+							spillWorklist := safeDelete(!spillWorklist,m);
 							if moveRelated m then
 								freezeWorklist := add(!freezeWorklist,m)
 							else
@@ -125,8 +126,8 @@ fun getAlias n = if member(!coalescedNodes,n) then getAlias (case tabBusca(n,!al
 
 fun addWorklist u =
 	if not (listmember u precolored) andalso not (moveRelated u andalso (tabBuscaDefaults (!degree, u, 0) < k)) then
-		(freezeWorklist := delete(!freezeWorklist,u);
-		simplifyWorklist := delete(!simplifyWorklist,u)) else ()
+		(freezeWorklist := safeDelete(!freezeWorklist,u);
+		simplifyWorklist := safeDelete(!simplifyWorklist,u)) else ()
 
 fun ok(t,r) = let val degreet = case tabBusca(t,!degree) of SOME x=>x|NONE=>raise Fail "Nnf"
 					in degreet < k orelse listmember t precolored orelse member(!adjSet,(t,r)) end
@@ -138,9 +139,9 @@ fun conservative nodes = let
 														in aux rest x end
 							in aux (listItems nodes) 0 < k end
 fun combine (u,v) = (if member(!freezeWorklist,v) then
-						freezeWorklist := delete(!freezeWorklist,v)
+						freezeWorklist := safeDelete(!freezeWorklist,v)
 					else
-						spillWorklist := delete(!spillWorklist,v);
+						spillWorklist := safeDelete(!spillWorklist,v);
 					coalescedNodes := add(!coalescedNodes,v);
 					alias:=tabRInserta(v,u,!alias);
 					let val moveListu = case tabBusca(u,!moveList) of SOME x=>x | NONE=>raise Fail "nodo no encontrado"
@@ -151,7 +152,7 @@ fun combine (u,v) = (if member(!freezeWorklist,v) then
 					app (fn t => (addEdge(t,u); decrementdegree(t))) (adjacent v);
 					let val degreeu = case tabBusca(u,!degree) of SOME x=>x | NONE => raise Fail "nnencontrado" in
 					if degreeu >= k andalso member(!freezeWorklist,u) then
-						(freezeWorklist := delete(!freezeWorklist,u);
+						(freezeWorklist := safeDelete(!freezeWorklist,u);
 						spillWorklist := add(!spillWorklist,u))
 					else () end)
 
@@ -183,7 +184,7 @@ fun freezeMoves u (FGRAPH {control, def, use, ismove}) =
 						val v = if (getAlias y) = (getAlias u) then getAlias x else getAlias y
 						val degreev = case tabBusca(v,!degree) of SOME x=>x | NONE => raise Fail "nnencontrado"
 					in
-						(activeMoves := delete(!activeMoves,m);
+						(activeMoves := safeDelete(!activeMoves,m);
 						frozenMoves := add(!frozenMoves,m);
 						if isEmpty(nodeMoves v) andalso degreev < k then
 							(freezeWorklist := add(!freezeWorklist,v);
@@ -195,14 +196,14 @@ fun freezeMoves u (FGRAPH {control, def, use, ismove}) =
 
 fun freeze graph = let val u = List.hd (listItems (!freezeWorklist))
 						in (
-							freezeWorklist := delete(!freezeWorklist,u);
+							freezeWorklist := safeDelete(!freezeWorklist,u);
 							simplifyWorklist := add(!simplifyWorklist,u);
 							freezeMoves u graph)
 						end
 
 fun selectSpill graph = let val m = List.hd (listItems (!freezeWorklist)) (*deberia usar una heuristica copada*)
 						in
-							(spillWorklist := delete(!spillWorklist,m);
+							(spillWorklist := safeDelete(!spillWorklist,m);
 							simplifyWorklist := add(!simplifyWorklist,m);
 							freezeMoves m graph)
 						end
