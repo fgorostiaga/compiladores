@@ -5,7 +5,7 @@ open tigergraph
 open tigerflow
 open Splayset
 
-val precolored = [tigerframe.fp, tigerframe.rv] @ tigerframe.argregs
+val precolored = tigerframe.specialregs @ tigerframe.argregs
 val adjSet = ref (empty (fn ((u0,v0),(u1,v1)) => if u0=u1 then String.compare(v0,v1) else String.compare(u0,u1)))
 val adjList = ref (tabNueva ())
 val degree = ref (tabInserList(tabNueva(), List.map (fn x => (x,99999999)) precolored))
@@ -24,15 +24,19 @@ val alias = ref (tabNueva())
 val color = ref (tabNueva())
 val coloredNodes = ref (empty String.compare)
 val spilledNodes = ref (empty String.compare)
-val k = 5
+
+val k = List.length (precolored@tigerframe.calleesaves)
+
+val colorToString = (precolored@tigerframe.calleesaves)
+
+fun zip [] [] = []
+	|zip (x::xs) (y::ys) = (x,y) :: (zip xs ys)
+	|zip _ _ = raise Fail "zip of different sizes"
 
 fun safeDelete(s,i) = if member(s,i) then delete(s,i) else s
 
 fun safeListDelete (xs,i) = (print ("removing "^Int.toString i^"safedelist\n");List.filter (fn x => x<>i) xs)
 
-fun zip [] [] = []
-	|zip (x::xs) (y::ys) = (x,y) :: (zip xs ys)
-	|zip _ _ = raise Fail "zip of different sizes"
 
 fun listmember _ [] = false
 	|listmember x (y::rest) = if x=y then true else listmember x rest
@@ -225,9 +229,9 @@ fun selectSpill graph = let
 						end
 	
 fun assignColors () =
-	let fun aux [] = app (fn n => let val colorgetaliasn = case tabBusca(getAlias n, !color) of SOME x=>x | NONE => raise Fail "nodo no encontrado en color"
+	let fun aux [] = app (fn n => let val colorgetaliasn = case tabBusca(getAlias n, !color) of SOME x=>x | NONE => raise Fail ("nodo no encontrado en color:"^getAlias n)
 										in color := tabRInserta(n,colorgetaliasn,!color) end ) (!coalescedNodes)
-			|aux (n :: rest) = let val inicolors = [0,1,2,3,4]
+			|aux (n :: rest) = let val inicolors = List.tabulate(k,(fn x=>x))
 									val adjListn = case tabBusca(n,!adjList) of SOME x=>x|NONE=> raise Fail "nne en adjlist"
 									val okColors = foldl (fn (w,colors) => if (member(addList(!coloredNodes,precolored),getAlias w)) then
 															let val colorgetaliasw = case tabBusca(getAlias w, !color) of SOME x=>x | NONE => raise Fail "nodo no encontrado en 2color2"
@@ -254,4 +258,4 @@ fun main fgraph nodes =
 		val _ = assignColors ()
 		val _ = print ("Select stack size: "^Int.toString (List.length (!selectStack)))
 		val _ = print ("Spilled nodes size: "^Int.toString (numItems (!spilledNodes)))
-	in (insarray,outsarray, !adjList,!color) end
+	in (insarray,outsarray, !adjList,!color, colorToString) end
