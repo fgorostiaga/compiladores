@@ -66,7 +66,7 @@ fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 		val _ = coloredNodes := (empty String.compare)
 		val _ = spilledNodes := (empty String.compare)
 		val _ = alias := (tabNueva())
-		val _ = color := (tabRInserta(tigerframe.fp,0,tabNueva()))
+		val _ = color := (tabInserList(tabNueva(),[(tigerframe.fp,0), (tigerframe.rv,1)]))
 
 
 		fun aux [] moveList worklistMoves _ = (moveList, worklistMoves)
@@ -250,4 +250,4 @@ fun main fgraph nodes =
 		val _ = assignColors ()
 		val _ = print ("Select stack size: "^Int.toString (List.length (!selectStack)))
 		val _ = print ("Spilled nodes size: "^Int.toString (numItems (!spilledNodes)))
-	in (insarray,outsarray, !adjList) end
+	in (insarray,outsarray, !adjList,!color) end

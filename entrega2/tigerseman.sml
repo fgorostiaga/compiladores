@@ -465,7 +465,9 @@ fun transExp(venv, tenv) =
 			val assems = List.map (format (fn x=>x)) instrs
 			val _ = List.map print assems
 			val (fgraph,nodes) = tigermakegraph.instrs2graph instrs
-			val (insarray, outsarray, adjSet) = tigercolor.main fgraph nodes
+			val (insarray, outsarray, adjSet,color) = tigercolor.main fgraph nodes
+			val assems = List.map (format (fn x=>case tabBusca(x,color) of SOME i => Int.toString i | NONE => raise Fail ("nocoloreado "^x))) instrs
+			val _ = List.map print assems
 			val _ = print (".-.-.-"^ Int.toString(List.length (tabClaves adjSet)))
 			val _ = tabAAplica (print, (fn set => (print "{"; Splayset.app (fn x => (print x;print ", ")) set ;print "}\n")), adjSet)
 			val _ = Array.appi (fn (i, temps) => (print ("\nLiveins at node "^Int.toString(i)^": "); Splayset.app(fn t=>print (t^", ")) temps)) insarray
