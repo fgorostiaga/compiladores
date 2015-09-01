@@ -21,9 +21,14 @@ val spillWorklist = ref (empty String.compare)
 val freezeWorklist = ref (empty String.compare)
 val simplifyWorklist = ref (empty String.compare)
 val alias = ref (tabNueva())
+val color = ref (tabNueva())
+val coloredNodes = ref (empty String.compare)
+val spilledNodes = ref (empty String.compare)
 val k = 5
 
 fun safeDelete(s,i) = if member(s,i) then delete(s,i) else s
+
+fun safeListDelete (xs,i) = (print ("removing "^Int.toString i^"safedelist\n");List.filter (fn x => x<>i) xs)
 
 fun listmember _ [] = false
 	|listmember x (y::rest) = if x=y then true else listmember x rest
@@ -58,7 +63,10 @@ fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 		val _ = coalescedMoves := (empty compare)
 		val _ = selectStack := []
 		val _ = coalescedNodes := (empty String.compare)
+		val _ = coloredNodes := (empty String.compare)
+		val _ = spilledNodes := (empty String.compare)
 		val _ = alias := (tabNueva())
+		val _ = color := (tabRInserta(tigerframe.fp,0,tabNueva()))
 
 
 		fun aux [] moveList worklistMoves _ = (moveList, worklistMoves)
@@ -212,6 +220,19 @@ fun selectSpill graph = let
 							freezeMoves m graph)
 						end
 	
+fun assignColors () =
+	let fun aux [] = app (fn n => let val colorgetaliasn = case tabBusca(getAlias n, !color) of SOME x=>x | NONE => raise Fail "nodo no encontrado en color"
+										in color := tabRInserta(n,colorgetaliasn,!color) end ) (!coalescedNodes)
+			|aux (n :: rest) = let val inicolors = [0,1,2,3,4]
+									val adjListn = case tabBusca(n,!adjList) of SOME x=>x|NONE=> raise Fail "nne en adjlist"
+									val okColors = foldl (fn (w,colors) => if (member(addList(!coloredNodes,precolored),getAlias w)) then
+															let val colorgetaliasw = case tabBusca(getAlias w, !color) of SOME x=>x | NONE => raise Fail "nodo no encontrado en 2color2"
+															in safeListDelete(colors,colorgetaliasw) end
+															else colors) inicolors adjListn
+									val _ = case okColors of (c::xs) =>(coloredNodes := add(!coloredNodes,n); color := tabRInserta(n,c,!color); print ("coloreado con "^Int.toString c^"\n"))
+															| [] => spilledNodes := add(!spilledNodes,n)
+								in (aux rest) end
+	in aux (!selectStack) end
 
 fun main fgraph nodes = 
 	let val (insarray, outsarray) = livenessAnalisis (fgraph, nodes)
@@ -226,4 +247,7 @@ fun main fgraph nodes =
 			else if not (isEmpty(!spillWorklist)) then (selectSpill fgraph)
 			else ()
 		val _ = iterate ()
+		val _ = assignColors ()
+		val _ = print ("Select stack size: "^Int.toString (List.length (!selectStack)))
+		val _ = print ("Spilled nodes size: "^Int.toString (numItems (!spilledNodes)))
 	in (insarray,outsarray, !adjList) end
