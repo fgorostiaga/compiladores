@@ -5,7 +5,7 @@ open tigergraph
 open tigerflow
 open Splayset
 
-val precolored = [tigerframe.fp]
+val precolored = [tigerframe.fp, tigerframe.rv] @ tigerframe.argregs
 val adjSet = ref (empty (fn ((u0,v0),(u1,v1)) => if u0=u1 then String.compare(v0,v1) else String.compare(u0,u1)))
 val adjList = ref (tabNueva ())
 val degree = ref (tabInserList(tabNueva(), List.map (fn x => (x,99999999)) precolored))
@@ -29,6 +29,10 @@ val k = 5
 fun safeDelete(s,i) = if member(s,i) then delete(s,i) else s
 
 fun safeListDelete (xs,i) = (print ("removing "^Int.toString i^"safedelist\n");List.filter (fn x => x<>i) xs)
+
+fun zip [] [] = []
+	|zip (x::xs) (y::ys) = (x,y) :: (zip xs ys)
+	|zip _ _ = raise Fail "zip of different sizes"
 
 fun listmember _ [] = false
 	|listmember x (y::rest) = if x=y then true else listmember x rest
@@ -66,7 +70,7 @@ fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 		val _ = coloredNodes := (empty String.compare)
 		val _ = spilledNodes := (empty String.compare)
 		val _ = alias := (tabNueva())
-		val _ = color := (tabInserList(tabNueva(),[(tigerframe.fp,0), (tigerframe.rv,1)]))
+		val _ = color := (tabInserList(tabNueva(),zip precolored (List.tabulate (List.length precolored,(fn x=>x)))))
 
 
 		fun aux [] moveList worklistMoves _ = (moveList, worklistMoves)
