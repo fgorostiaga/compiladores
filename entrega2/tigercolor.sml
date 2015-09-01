@@ -5,9 +5,10 @@ open tigergraph
 open tigerflow
 open Splayset
 
+val precolored = [tigerframe.fp]
 val adjSet = ref (empty (fn ((u0,v0),(u1,v1)) => if u0=u1 then String.compare(v0,v1) else String.compare(u0,u1)))
 val adjList = ref (tabNueva ())
-val degree : (tigertemp.temp , int) Tabla ref = ref (tabNueva ())
+val degree = ref (tabInserList(tabNueva(), List.map (fn x => (x,99999999)) precolored))
 val moveList = ref (tabNueva())
 val worklistMoves = ref (empty compare)
 val activeMoves = ref (empty compare)
@@ -20,7 +21,6 @@ val spillWorklist = ref (empty String.compare)
 val freezeWorklist = ref (empty String.compare)
 val simplifyWorklist = ref (empty String.compare)
 val alias = ref (tabNueva())
-val precolored = [tigerframe.fp]
 val k = 5
 
 fun safeDelete(s,i) = if member(s,i) then delete(s,i) else s
@@ -49,7 +49,7 @@ fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 	let
 		val _ = adjSet := (empty (fn ((u0,v0),(u1,v1)) => if u0=u1 then String.compare(v0,v1) else String.compare(u0,u1)))
 		val _ = adjList := (tabNueva ())
-		val _ = degree := (tabNueva ())
+		val _ = degree := (tabInserList(tabNueva(), List.map (fn x => (x,99999999)) precolored))
 		val _ = moveList := (tabNueva())
 		val _ = worklistMoves := (empty compare)
 		val _ = activeMoves := (empty compare)
@@ -102,7 +102,7 @@ fun adjacent n = let val adjlistn = tabBuscaDefaults(!adjList,n, empty String.co
 
 fun enableMoves nodes = app (fn n => app (fn m => if member(!activeMoves,m) then (activeMoves:=safeDelete(!activeMoves,m);worklistMoves:=add(!worklistMoves,m)) else ()) (nodeMoves n)) nodes
 
-fun decrementdegree m = let val d = case tabBusca(m,!degree) of SOME x => x | NONE => raise Fail "Nodo no encontrado"
+fun decrementdegree m = let val d = case tabBusca(m,!degree) of SOME x => x | NONE => raise Fail ("Nodo no encontrado 111111"^m)
 							val _ = degree := tabRInserta(m,d-1,!degree)
 							in if d = k then (
 							enableMoves (add(adjacent m,m));
@@ -114,13 +114,13 @@ fun decrementdegree m = let val d = case tabBusca(m,!degree) of SOME x => x | NO
 							) else ()
 							end
 
-fun simplify () = let val wlist = listItems(!simplifyWorklist)
-  						val _ = simplifyWorklist := empty String.compare
-  						fun aux [] = ()
-						  |aux (n :: rest) = let val _ = selectStack := (n :: !selectStack)
-						  							val _ = app (fn m => decrementdegree m) (adjacent n)
-												in aux rest end
-						in aux wlist end
+fun simplify () = let 
+						val n = List.hd (listItems(!simplifyWorklist))
+  						val _ = simplifyWorklist := delete(!simplifyWorklist,n)
+					in
+						(selectStack := (n :: !selectStack);
+						app (fn m => (decrementdegree m)) (adjacent n))
+					end
 
 fun getAlias n = if member(!coalescedNodes,n) then getAlias (case tabBusca(n,!alias) of SOME x=>x|NONE=>raise Fail "nnf") else n
 
@@ -149,7 +149,7 @@ fun combine (u,v) = (if member(!freezeWorklist,v) then
 					in
 						moveList := tabRInserta(u,union(moveListu,moveListv), !moveList) end;
 					enableMoves(singleton String.compare v);
-					app (fn t => (addEdge(t,u); decrementdegree(t))) (adjacent v);
+					app (fn t => (addEdge(t,u);decrementdegree(t))) (adjacent v);
 					let val degreeu = tabBuscaDefaults(!degree,u,0) in
 					if degreeu >= k andalso member(!freezeWorklist,u) then
 						(freezeWorklist := safeDelete(!freezeWorklist,u);
@@ -220,7 +220,8 @@ fun main fgraph nodes =
             else if not (isEmpty(!worklistMoves)) then coalesce fgraph
             else if not (isEmpty(!freezeWorklist)) then freeze fgraph
 			else selectSpill fgraph 
-			; iterate ()
+			;print "iter\n"; iterate ()
           )
 		val _ = iterate ()
+		val _ = print "knife\n"
 	in (insarray,outsarray, !adjList) end
