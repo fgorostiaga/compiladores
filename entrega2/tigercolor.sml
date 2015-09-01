@@ -160,7 +160,8 @@ fun combine (u,v) = (if member(!freezeWorklist,v) then
 fun coalesce (FGRAPH {control, def, use, ismove}) = let val wlist = listItems (!worklistMoves)
 						val _ = worklistMoves := empty compare
 						fun aux [] = ()
-							|aux (m :: rest) = let val x = getAlias (List.hd (case tabBusca(m,use) of SOME x=>x|NONE=>raise Fail "node not found"))
+							|aux (m :: rest) = let
+													val x = getAlias (List.hd (case tabBusca(m,use) of SOME x=>x|NONE=>raise Fail "node not found"))
 													val y = getAlias (List.hd (case tabBusca(m,def) of SOME x=>x|NONE=>raise Fail "node not found"))
 													val (u,v) = if listmember y precolored then (y,x) else (x,y)
 													val _ = if (u=v) then
@@ -179,7 +180,8 @@ fun coalesce (FGRAPH {control, def, use, ismove}) = let val wlist = listItems (!
 						in aux wlist end
 
 fun freezeMoves u (FGRAPH {control, def, use, ismove}) =
-	let fun aux m = let val x = List.hd (case tabBusca(m,use) of SOME x=>x|NONE=>raise Fail "node not found")
+	let fun aux m = let 
+						val x = List.hd (case tabBusca(m,use) of SOME x=>x|NONE=>raise Fail "node not found")
 						val y = List.hd (case tabBusca(m,def) of SOME x=>x|NONE=>raise Fail "node not found")
 						val v = if (getAlias y) = (getAlias u) then getAlias x else getAlias y
 						val degreev = case tabBusca(v,!degree) of SOME x=>x | NONE => raise Fail "nnencontrado"
@@ -194,14 +196,16 @@ fun freezeMoves u (FGRAPH {control, def, use, ismove}) =
 		in app aux (nodeMoves u) end
 
 
-fun freeze graph = let val u = List.hd (listItems (!freezeWorklist))
+fun freeze graph = let 
+						val u = List.hd (listItems (!freezeWorklist))
 						in (
 							freezeWorklist := safeDelete(!freezeWorklist,u);
 							simplifyWorklist := add(!simplifyWorklist,u);
 							freezeMoves u graph)
 						end
 
-fun selectSpill graph = let val m = List.hd (listItems (!freezeWorklist)) (*deberia usar una heuristica copada*)
+fun selectSpill graph = let
+						val m = List.hd (listItems (!spillWorklist)) (*deberia usar una heuristica copada*)
 						in
 							(spillWorklist := safeDelete(!spillWorklist,m);
 							simplifyWorklist := add(!simplifyWorklist,m);
@@ -215,13 +219,11 @@ fun main fgraph nodes =
 		val _ = (moveList := a; worklistMoves := b)
 		val (a, b, c) = makeWorklist ()
 		val _ = (spillWorklist := a; freezeWorklist :=b; simplifyWorklist:=c)
-		fun iterate () = if isEmpty(!simplifyWorklist) andalso isEmpty(!worklistMoves) andalso isEmpty(!freezeWorklist) andalso isEmpty(!spillWorklist) then () else (
-            if not (isEmpty(!simplifyWorklist)) then simplify ()
-            else if not (isEmpty(!worklistMoves)) then coalesce fgraph
-            else if not (isEmpty(!freezeWorklist)) then freeze fgraph
-			else selectSpill fgraph 
-			;print "iter\n"; iterate ()
-          )
+		fun iterate () =
+            if not (isEmpty(!simplifyWorklist)) then (simplify (); iterate ())
+            else if not (isEmpty(!worklistMoves)) then (coalesce fgraph; iterate ())
+            else if not (isEmpty(!freezeWorklist)) then (freeze fgraph; iterate ())
+			else if not (isEmpty(!spillWorklist)) then (selectSpill fgraph)
+			else ()
 		val _ = iterate ()
-		val _ = print "knife\n"
 	in (insarray,outsarray, !adjList) end
