@@ -27,7 +27,7 @@ val spilledNodes = ref (empty String.compare)
 
 val k = List.length (precolored@tigerframe.calleesaves)
 
-val colorToString = (precolored@tigerframe.calleesaves)
+fun colorToString i = List.nth(precolored@tigerframe.calleesaves,i)
 
 fun zip [] [] = []
 	|zip (x::xs) (y::ys) = (x,y) :: (zip xs ys)
@@ -135,6 +135,7 @@ fun simplify () = let
   						val _ = simplifyWorklist := delete(!simplifyWorklist,n)
 					in
 						(selectStack := (n :: !selectStack);
+						print ("added "^n^" to selectstack\n");
 						app (fn m => (decrementdegree m)) (adjacent n))
 					end
 
@@ -237,8 +238,8 @@ fun assignColors () =
 															let val colorgetaliasw = case tabBusca(getAlias w, !color) of SOME x=>x | NONE => raise Fail "nodo no encontrado en 2color2"
 															in safeListDelete(colors,colorgetaliasw) end
 															else colors) inicolors adjListn
-									val _ = case okColors of (c::xs) =>(coloredNodes := add(!coloredNodes,n); color := tabRInserta(n,c,!color); print ("coloreado con "^Int.toString c^"\n"))
-															| [] => spilledNodes := add(!spilledNodes,n)
+									val _ = case okColors of (c::xs) =>(coloredNodes := add(!coloredNodes,n); color := tabRInserta(n,c,!color); print ("coloreado "^n^"con "^colorToString c^"\n"))
+															| [] => spilledNodes := (print "SPILLING!\n";add(!spilledNodes,n))
 								in (aux rest) end
 	in aux (!selectStack) end
 
