@@ -142,7 +142,7 @@ fun simplify () = let
 fun getAlias n = if member(!coalescedNodes,n) then getAlias (case tabBusca(n,!alias) of SOME x=>x|NONE=>raise Fail "nnf") else n
 
 fun addWorklist u =
-	if not (listmember u precolored) andalso not (moveRelated u andalso (tabBuscaDefaults (!degree, u, 0) < k)) then
+	if (not (listmember u precolored)) andalso (not (moveRelated u)) andalso (tabBuscaDefaults (!degree, u, 0) < k) then
 		(freezeWorklist := safeDelete(!freezeWorklist,u);
 		simplifyWorklist := safeDelete(!simplifyWorklist,u)) else ()
 
@@ -160,6 +160,7 @@ fun combine (u,v) = (if member(!freezeWorklist,v) then
 					else
 						spillWorklist := safeDelete(!spillWorklist,v);
 					coalescedNodes := add(!coalescedNodes,v);
+					print ("combinando "^u^" con "^v^"\n");
 					alias:=tabRInserta(v,u,!alias);
 					let val moveListu = case tabBusca(u,!moveList) of SOME x=>x | NONE=>raise Fail "nodo no encontrado"
 						val moveListv = case tabBusca(v,!moveList) of SOME x=>x | NONE=>raise Fail "nodo no encontrado"
@@ -236,9 +237,10 @@ fun assignColors () =
 									val adjListn = case tabBusca(n,!adjList) of SOME x=>x|NONE=> raise Fail "nne en adjlist"
 									val okColors = foldl (fn (w,colors) => if (member(addList(!coloredNodes,precolored),getAlias w)) then
 															let val colorgetaliasw = case tabBusca(getAlias w, !color) of SOME x=>x | NONE => raise Fail "nodo no encontrado en 2color2"
+																val _ = print ("Nodo "^w^" con alias "^getAlias w^" es adyacente a "^n^" y su color es "^Int.toString colorgetaliasw)
 															in safeListDelete(colors,colorgetaliasw) end
-															else colors) inicolors adjListn
-									val _ = case okColors of (c::xs) =>(coloredNodes := add(!coloredNodes,n); color := tabRInserta(n,c,!color); print ("coloreado "^n^"con "^colorToString c^"\n"))
+															else (print ("Nodo "^w^" con alias "^getAlias w^" es adyacente a "^n^" pero no esta coloreado\n");colors)) inicolors adjListn
+									val _ = case okColors of (c::xs) =>(coloredNodes := add(!coloredNodes,n); color := tabRInserta(n,c,!color); print ("coloreado "^n^" con "^Int.toString c^"\n"))
 															| [] => spilledNodes := (print "SPILLING!\n";add(!spilledNodes,n))
 								in (aux rest) end
 	in aux (!selectStack) end
