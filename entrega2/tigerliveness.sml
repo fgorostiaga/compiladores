@@ -4,7 +4,7 @@ open tigerflow
 open tigertab
 fun livenessAnalisis (FGRAPH {control, def, use, ismove}, nodeList) : (tigertemp.temp set array * tigertemp.temp set array) =
 
-
+(* Faaa que animal feliii *)
 	let 
 		fun getuse index = let val mynode = List.nth (nodeList, index)
 								val uses = (case tabBusca (mynode, use) of SOME x=> x | NONE => [])

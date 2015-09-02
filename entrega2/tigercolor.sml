@@ -90,7 +90,7 @@ fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 											val worklistMoves = add(worklistMoves,instr)
 										in (live,moveList,worklistMoves) end
 						|NONE => raise Fail "nodo no encontrado en ismove"
-					val defsinstr = findInTab(instr,def)
+					val defsinstr = findInTab(instr,def) (*para que pones el empty? @Feli *)
 					val live = union(live, defsinstr)
 					val _ = app (fn d => app (fn l => addEdge(l,d)) live) defsinstr
 				in aux rest moveList worklistMoves (i+1) end
@@ -101,9 +101,9 @@ fun nodeMoves n = intersection(tabBuscaDefaults(!moveList,n,empty compare),union
 
 fun moveRelated n = not (isEmpty(nodeMoves n))
 
-fun makeWorklist () = let val initial = tigerframe.argregs @ (tigerframe.fp :: List.tabulate(tigertemp.lastTempIndex (), fn(i)=>"T"^Int.toString(i)))
+fun makeWorklist () = let val initial = tigerframe.argregs @ (tigerframe.fp :: List.tabulate(tigertemp.lastTempIndex (), fn(i)=>"T"^Int.toString(i))) (*che pa que fumaste? jaja explicame como creaste este initial :) *)
 							fun aux [] tr = tr
-								|aux (n::rest) (spwl,fwl,siwl) =
+								|aux (n::rest) (spwl,fwl,siwl)  =
 									let 
 										val degreen = tabBuscaDefaults(!degree,n,~1)
 										val (spwl,fwl,siwl) = if (degreen<0) then (spwl,fwl,siwl) else if degreen >= k then
@@ -196,7 +196,7 @@ fun coalesce (FGRAPH {control, def, use, ismove}) = let val wlist = listItems (!
 						in aux wlist end
 
 fun freezeMoves u (FGRAPH {control, def, use, ismove}) =
-	let fun aux m = let 
+	let fun aux m = let (*Como te diste cuenta de quien es x e y? *) 
 						val x = List.hd (case tabBusca(m,use) of SOME x=>x|NONE=>raise Fail "node not found")
 						val y = List.hd (case tabBusca(m,def) of SOME x=>x|NONE=>raise Fail "node not found")
 						val v = if (getAlias y) = (getAlias u) then getAlias x else getAlias y
