@@ -90,7 +90,7 @@ fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 											val worklistMoves = add(worklistMoves,instr)
 										in (live,moveList,worklistMoves) end
 						|NONE => raise Fail "nodo no encontrado en ismove"
-					val defsinstr = findInTab(instr,def) (*para que pones el empty? @Feli *)
+					val defsinstr = findInTab(instr,def) (*para que pones el empty? @Feli *) (*Donde? En findInTab? Para poder inicializar un conjunto con todos los elementos de la lista*)
 					val live = union(live, defsinstr)
 					val _ = app (fn d => app (fn l => addEdge(l,d)) live) defsinstr
 				in aux rest moveList worklistMoves (i+1) end
@@ -101,7 +101,7 @@ fun nodeMoves n = intersection(tabBuscaDefaults(!moveList,n,empty compare),union
 
 fun moveRelated n = not (isEmpty(nodeMoves n))
 
-fun makeWorklist () = let val initial = tigerframe.argregs @ (tigerframe.fp :: List.tabulate(tigertemp.lastTempIndex (), fn(i)=>"T"^Int.toString(i))) (*che pa que fumaste? jaja explicame como creaste este initial :) *)
+fun makeWorklist () = let val initial = (*precolored @*) (List.tabulate(tigertemp.lastTempIndex (), fn(i)=>"T"^Int.toString(i))) (*che pa que fumaste? jaja explicame como creaste este initial :) *) (*Asqueroso hack ;P. Los nodos no precoloreados y no procesados son T0, T1, T2....Tn*)
 							fun aux [] tr = tr
 								|aux (n::rest) (spwl,fwl,siwl)  =
 									let 
@@ -178,8 +178,8 @@ fun coalesce (FGRAPH {control, def, use, ismove}) = let val wlist = listItems (!
 						val _ = worklistMoves := empty compare
 						fun aux [] = ()
 							|aux (m :: rest) = let
-													val x = getAlias (List.hd (case tabBusca(m,use) of SOME x=>x|NONE=>raise Fail "node not found"))
-													val y = getAlias (List.hd (case tabBusca(m,def) of SOME x=>x|NONE=>raise Fail "node not found"))
+													val x = getAlias (case tabBusca(m,use) of SOME [x]=>x|SOME _ => raise Fail "mas de un use en move coalesce" |NONE=>raise Fail "node not found")
+													val y = getAlias (case tabBusca(m,def) of SOME [y]=>y|SOME _ => raise Fail "mas de un def en move coalesce" |NONE=>raise Fail "node not found")
 													val (u,v) = if listmember y precolored then (y,x) else (x,y)
 													val _ = if (u=v) then
 																(coalescedMoves:=add(!coalescedMoves,m);addWorklist(u))
@@ -197,9 +197,9 @@ fun coalesce (FGRAPH {control, def, use, ismove}) = let val wlist = listItems (!
 						in aux wlist end
 
 fun freezeMoves u (FGRAPH {control, def, use, ismove}) =
-	let fun aux m = let (*Como te diste cuenta de quien es x e y? *) 
-						val x = List.hd (case tabBusca(m,use) of SOME x=>x|NONE=>raise Fail "node not found")
-						val y = List.hd (case tabBusca(m,def) of SOME x=>x|NONE=>raise Fail "node not found")
+	let fun aux m = let (*Como te diste cuenta de quien es x e y? *) (*Se supone que son el unico elemento de las listas de def y use respectivamente. Tambien lo hice en coalesce*)
+						val x = getAlias (case tabBusca(m,use) of SOME [x]=>x|SOME _ => raise Fail "mas de un use en move coalesce" |NONE=>raise Fail "node not found")
+						val y = getAlias (case tabBusca(m,def) of SOME [y]=>y|SOME _ => raise Fail "mas de un def en move coalesce" |NONE=>raise Fail "node not found")
 						val v = if (getAlias y) = (getAlias u) then getAlias x else getAlias y
 						val degreev = case tabBusca(v,!degree) of SOME x=>x | NONE => raise Fail "nnencontrado"
 					in
