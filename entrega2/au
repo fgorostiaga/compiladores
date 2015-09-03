@@ -1,0 +1,1257 @@
+LABEL FOR _tigermain: _tigermain
+LABEL FOR prettyprint: L0
+LABEL FOR write: L2
+LABEL FOR show: L3
+LABEL FOR indent: L4
+ADDED L4
+ADDED L3
+ADDED L2
+ADDED L0
+ADDED _tigermain
+Todos los frags:
+L1:	.quad 0
+	.string8 ""
+L6:	.quad 1
+	.string8 " "
+L9:	.quad 1
+	.string8 "\x0a"
+L4:jiji
+LABEL L18
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP FP,
+   CONST 0)),
+ TEMP ARG1)
+MOVE(
+ TEMP T2,
+ TEMP ARG2)
+MOVE(
+ TEMP T3,
+ CONST 1)
+LABEL L7
+CJUMP(GT,
+ TEMP T3,
+ MEM(
+  BINOP(PLUS,
+   MEM(
+    TEMP FP),
+   CONST ~4)),
+ L5,L8)
+LABEL L8
+EXP(
+ CALL(
+  NAME L2,
+   MEM(
+    MEM(
+     TEMP FP)),
+   NAME L6))
+MOVE(
+ TEMP T3,
+ BINOP(PLUS,
+  TEMP T3,
+  CONST 1))
+JUMP( NAME L7)
+LABEL L5
+MOVE(
+ TEMP T9,
+ BINOP(PLUS,
+  MEM(
+   MEM(
+    TEMP FP)),
+  CONST 0))
+MOVE(
+ TEMP T8,
+ CALL(
+  NAME concat,
+   MEM(
+    BINOP(PLUS,
+     MEM(
+      MEM(
+       TEMP FP)),
+     CONST 0)),
+   TEMP T2))
+MOVE(
+ MEM(
+  TEMP T9),
+ TEMP T8)
+EXP(
+ CALL(
+  NAME L2,
+   MEM(
+    MEM(
+     TEMP FP)),
+   NAME L9))
+JUMP( NAME L17)
+LABEL L17
+;;-------:jiji
+L10:	.quad 1
+	.string8 "."
+L3:jiji
+LABEL L20
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP FP,
+   CONST 0)),
+ TEMP ARG1)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP FP,
+   CONST ~4)),
+ TEMP ARG2)
+MOVE(
+ TEMP T1,
+ TEMP ARG3)
+CJUMP(EQ,
+ TEMP T1,
+ CONST 0,
+ L11,L12)
+LABEL L12
+EXP(
+ CALL(
+  NAME L4,
+   TEMP FP,
+   MEM(
+    BINOP(PLUS,
+     TEMP T1,
+     BINOP(MUL,
+      CONST 0,
+      CONST 4)))))
+EXP(
+ CALL(
+  NAME L3,
+   MEM(
+    TEMP FP),
+   BINOP(PLUS,
+    MEM(
+     BINOP(PLUS,
+      TEMP FP,
+      CONST ~4)),
+    CONST 1),
+   MEM(
+    BINOP(PLUS,
+     TEMP T1,
+     BINOP(MUL,
+      CONST 1,
+      CONST 4)))))
+EXP(
+ CALL(
+  NAME L3,
+   MEM(
+    TEMP FP),
+   BINOP(PLUS,
+    MEM(
+     BINOP(PLUS,
+      TEMP FP,
+      CONST ~4)),
+    CONST 1),
+   MEM(
+    BINOP(PLUS,
+     TEMP T1,
+     BINOP(MUL,
+      CONST 2,
+      CONST 4)))))
+LABEL L13
+JUMP( NAME L19)
+LABEL L11
+EXP(
+ CALL(
+  NAME L4,
+   TEMP FP,
+   NAME L10))
+JUMP( NAME L13)
+LABEL L19
+;;-------:jiji
+L2:jiji
+LABEL L22
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP FP,
+   CONST 0)),
+ TEMP ARG1)
+MOVE(
+ TEMP T4,
+ TEMP ARG2)
+MOVE(
+ TEMP T11,
+ BINOP(PLUS,
+  MEM(
+   TEMP FP),
+  CONST 0))
+MOVE(
+ TEMP T10,
+ CALL(
+  NAME concat,
+   MEM(
+    BINOP(PLUS,
+     MEM(
+      TEMP FP),
+     CONST 0)),
+   TEMP T4))
+MOVE(
+ MEM(
+  TEMP T11),
+ TEMP T10)
+JUMP( NAME L21)
+LABEL L21
+;;-------:jiji
+L0:jiji
+LABEL L24
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP FP,
+   CONST 0)),
+ TEMP ARG1)
+MOVE(
+ TEMP T0,
+ TEMP ARG2)
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP FP,
+   CONST 0)),
+ NAME L1)
+EXP(
+ CALL(
+  NAME L3,
+   TEMP FP,
+   CONST 0,
+   TEMP T0))
+MOVE(
+ TEMP RV,
+ MEM(
+  BINOP(PLUS,
+   TEMP FP,
+   CONST 0)))
+JUMP( NAME L23)
+LABEL L23
+;;-------:jiji
+L14:	.quad 4
+	.string8 "left"
+L15:	.quad 5
+	.string8 "right"
+L16:	.quad 6
+	.string8 "awanta"
+_tigermain:jiji
+LABEL L26
+MOVE(
+ MEM(
+  BINOP(PLUS,
+   TEMP FP,
+   CONST 0)),
+ TEMP ARG1)
+MOVE(
+ TEMP T5,
+ CALL(
+  NAME _allocRecord,
+   CONST 3,
+   NAME L14,
+   CONST 0,
+   CONST 0))
+MOVE(
+ TEMP T6,
+ CALL(
+  NAME _allocRecord,
+   CONST 3,
+   NAME L15,
+   CONST 0,
+   CONST 0))
+MOVE(
+ TEMP T7,
+ CALL(
+  NAME _allocRecord,
+   CONST 3,
+   NAME L16,
+   TEMP T5,
+   TEMP T6))
+MOVE(
+ TEMP T12,
+ CALL(
+  NAME L0,
+   TEMP FP,
+   TEMP T7))
+EXP(
+ CALL(
+  NAME print,
+   TEMP T12))
+MOVE(
+ TEMP RV,
+ CONST 0)
+JUMP( NAME L25)
+LABEL L25
+;;-------:jiji
+----------------
+ADDING (L1,.quad 0
+	.string8 "")
+ADDING (L6,.quad 1
+	.string8 " ")
+ADDING (L9,.quad 1
+	.string8 "\x0a")
+ADDING (L4,)
+ADDING (;;-------,)
+ADDING (L10,.quad 1
+	.string8 ".")
+ADDING (L3,)
+ADDING (;;-------,)
+ADDING (L2,)
+ADDING (;;-------,)
+ADDING (L0,)
+ADDING (;;-------,)
+ADDING (L14,.quad 4
+	.string8 "left")
+ADDING (L15,.quad 5
+	.string8 "right")
+ADDING (L16,.quad 6
+	.string8 "awanta")
+ADDING (_tigermain,)
+ADDING (;;-------,)
+L1:
+	.quad 0
+	.string8 ""
+L6:
+	.quad 1
+	.string8 " "
+L9:
+	.quad 1
+	.string8 "\x0a"
+L4: 
+L18: 
+MOV FP, T18
+MOV $0, T19 
+ADD T19, T18
+MOV ARG1, (T18) 
+MOV ARG2, T2
+MOV $1, T3 
+L7: 
+MOV (FP), T22
+MOV T22, T21
+MOV $~4, T23 
+ADD T23, T21
+MOV (T21), T20
+CMP T3, T20 <CR> JG L5 
+L8: 
+MOV $L6, T24
+MOV T24, ARG2
+MOV (FP), T26
+MOV (T26), T25
+MOV T25, ARG1
+CALL L2
+MOV T3, T27
+MOV $1, T28 
+ADD T28, T27
+MOV T27, T3 
+JMP L7 
+L5: 
+MOV (FP), T31
+MOV (T31), T30
+MOV T30, T29
+MOV $0, T32 
+ADD T32, T29
+MOV T29, T9 
+MOV T2, ARG2
+MOV (FP), T36
+MOV (T36), T35
+MOV T35, T34
+MOV $0, T37 
+ADD T37, T34
+MOV (T34), T33
+MOV T33, ARG1
+CALL concat
+MOV RV, T8 
+MOV T8, (T9) 
+MOV $L9, T38
+MOV T38, ARG2
+MOV (FP), T40
+MOV (T40), T39
+MOV T39, ARG1
+CALL L2
+JMP L17 
+L17: 
+heres a node too
+;;-------: 
+L10:
+	.quad 1
+	.string8 "."
+L3: 
+L20: 
+MOV FP, T41
+MOV $0, T42 
+ADD T42, T41
+MOV ARG1, (T41) 
+MOV FP, T43
+MOV $~4, T44 
+ADD T44, T43
+MOV ARG2, (T43) 
+MOV ARG3, T1
+MOV $0, T45 
+CMP T1, T45 <CR> JE L11 
+L12: 
+MOV T1, T47
+MOV $0, T49 
+MOV T49, T48
+MOV $4, T50 
+MULT50, T48
+ADD T48, T47
+MOV (T47), T46
+MOV T46, ARG2
+MOV FP, ARG1
+CALL L4
+MOV T1, T52
+MOV $1, T54 
+MOV T54, T53
+MOV $4, T55 
+MULT55, T53
+ADD T53, T52
+MOV (T52), T51
+MOV T51, ARG3
+MOV FP, T58
+MOV $~4, T59 
+ADD T59, T58
+MOV (T58), T57
+MOV T57, T56
+MOV $1, T60 
+ADD T60, T56
+MOV T56, ARG2
+MOV (FP), T61
+MOV T61, ARG1
+CALL L3
+MOV T1, T63
+MOV $2, T65 
+MOV T65, T64
+MOV $4, T66 
+MULT66, T64
+ADD T64, T63
+MOV (T63), T62
+MOV T62, ARG3
+MOV FP, T69
+MOV $~4, T70 
+ADD T70, T69
+MOV (T69), T68
+MOV T68, T67
+MOV $1, T71 
+ADD T71, T67
+MOV T67, ARG2
+MOV (FP), T72
+MOV T72, ARG1
+CALL L3
+L13: 
+JMP L19 
+L11: 
+MOV $L10, T73
+MOV T73, ARG2
+MOV FP, ARG1
+CALL L4
+JMP L13 
+L19: 
+heres a node too
+;;-------: 
+L2: 
+L22: 
+MOV FP, T74
+MOV $0, T75 
+ADD T75, T74
+MOV ARG1, (T74) 
+MOV ARG2, T4
+MOV (FP), T77
+MOV T77, T76
+MOV $0, T78 
+ADD T78, T76
+MOV T76, T11 
+MOV T4, ARG2
+MOV (FP), T81
+MOV T81, T80
+MOV $0, T82 
+ADD T82, T80
+MOV (T80), T79
+MOV T79, ARG1
+CALL concat
+MOV RV, T10 
+MOV T10, (T11) 
+JMP L21 
+L21: 
+heres a node too
+;;-------: 
+L0: 
+L24: 
+MOV FP, T83
+MOV $0, T84 
+ADD T84, T83
+MOV ARG1, (T83) 
+MOV ARG2, T0
+MOV FP, T85
+MOV $0, T86 
+ADD T86, T85
+MOV $L1, T87
+MOV T87, (T85) 
+MOV T0, ARG3
+MOV $0, T88 
+MOV T88, ARG2
+MOV FP, ARG1
+CALL L3
+MOV FP, T90
+MOV $0, T91 
+ADD T91, T90
+MOV (T90), T89
+MOV T89, RV 
+JMP L23 
+L23: 
+heres a node too
+;;-------: 
+L14:
+	.quad 4
+	.string8 "left"
+L15:
+	.quad 5
+	.string8 "right"
+L16:
+	.quad 6
+	.string8 "awanta"
+_tigermain: 
+L26: 
+MOV FP, T92
+MOV $0, T93 
+ADD T93, T92
+MOV ARG1, (T92) 
+MOV $0, T94 
+MOV T94, ARG4
+MOV $0, T95 
+MOV T95, ARG3
+MOV $L14, T96
+MOV T96, ARG2
+MOV $3, T97 
+MOV T97, ARG1
+CALL _allocRecord
+MOV RV, T5 
+MOV $0, T98 
+MOV T98, ARG4
+MOV $0, T99 
+MOV T99, ARG3
+MOV $L15, T100
+MOV T100, ARG2
+MOV $3, T101 
+MOV T101, ARG1
+CALL _allocRecord
+MOV RV, T6 
+MOV T6, ARG4
+MOV T5, ARG3
+MOV $L16, T102
+MOV T102, ARG2
+MOV $3, T103 
+MOV T103, ARG1
+CALL _allocRecord
+MOV RV, T7 
+MOV T7, ARG2
+MOV FP, ARG1
+CALL L0
+MOV RV, T12 
+MOV T12, ARG1
+CALL print
+MOV $0, RV 
+JMP L25 
+L25: 
+heres a node too
+;;-------: 
+Size of simp: 28
+added T19 to selectstack
+added T20 to selectstack
+added T23 to selectstack
+added T26 to selectstack
+added T28 to selectstack
+added T31 to selectstack
+added T32 to selectstack
+added T36 to selectstack
+added T37 to selectstack
+added T40 to selectstack
+added T42 to selectstack
+added T44 to selectstack
+added T45 to selectstack
+added T50 to selectstack
+added T55 to selectstack
+added T59 to selectstack
+added T60 to selectstack
+added T66 to selectstack
+added T70 to selectstack
+added T71 to selectstack
+added T75 to selectstack
+added T78 to selectstack
+added T82 to selectstack
+added T84 to selectstack
+added T86 to selectstack
+added T87 to selectstack
+added T91 to selectstack
+added T93 to selectstack
+combinando ARG1 con T61
+agregando ARG1 a worklist
+y salio por aca
+combinando T1 con T63
+agregando T1 a worklist
+y salio por aca
+combinando T65 con T64
+agregando T65 a worklist
+size: 0T65is NOT member
+combinando ARG3 con T62
+agregando ARG3 a worklist
+y salio por aca
+agregando FP a worklist
+y salio por aca
+agregando T69 a worklist
+size: 0T69is NOT member
+combinando T68 con T67
+agregando T68 a worklist
+size: 0T68is NOT member
+combinando ARG2 con T68
+agregando ARG2 a worklist
+y salio por aca
+combinando ARG1 con T72
+agregando ARG1 a worklist
+y salio por aca
+combinando ARG2 con T73
+agregando ARG2 a worklist
+y salio por aca
+agregando ARG1 a worklist
+y salio por aca
+agregando FP a worklist
+y salio por aca
+combinando T22 con T21
+agregando T22 a worklist
+size: 0T22is NOT member
+agregando FP a worklist
+y salio por aca
+agregando T74 a worklist
+size: 0T74is NOT member
+combinando ARG2 con T4
+agregando ARG2 a worklist
+y salio por aca
+combinando T77 con T76
+agregando T77 a worklist
+size: 0T77is NOT member
+combinando T77 con T11
+agregando T77 a worklist
+y salio por aca
+agregando ARG2 a worklist
+y salio por aca
+combinando T81 con T80
+agregando T81 a worklist
+size: 0T81is NOT member
+combinando ARG1 con T79
+agregando ARG1 a worklist
+y salio por aca
+combinando RV con T10
+agregando RV a worklist
+y salio por aca
+agregando FP a worklist
+y salio por aca
+agregando T83 a worklist
+size: 1T83is NOT member
+combinando ARG2 con T0
+agregando ARG2 a worklist
+y salio por aca
+agregando FP a worklist
+y salio por aca
+agregando T85 a worklist
+size: 1T85is NOT member
+agregando ARG3 a worklist
+y salio por aca
+agregando ARG2 a worklist
+y salio por aca
+combinando ARG2 con T88
+agregando ARG2 a worklist
+y salio por aca
+agregando ARG1 a worklist
+y salio por aca
+agregando FP a worklist
+y salio por aca
+agregando FP a worklist
+y salio por aca
+agregando T90 a worklist
+size: 1T90is NOT member
+combinando RV con T89
+agregando RV a worklist
+y salio por aca
+agregando FP a worklist
+y salio por aca
+agregando T92 a worklist
+size: 1T92is NOT member
+combinando ARG4 con T94
+agregando ARG4 a worklist
+y salio por aca
+combinando ARG3 con T95
+agregando ARG3 a worklist
+y salio por aca
+combinando ARG2 con T96
+agregando ARG2 a worklist
+y salio por aca
+combinando ARG1 con T97
+agregando ARG1 a worklist
+y salio por aca
+combinando RV con T5
+agregando RV a worklist
+y salio por aca
+combinando ARG4 con T98
+agregando ARG4 a worklist
+y salio por aca
+combinando ARG3 con T99
+agregando ARG3 a worklist
+y salio por aca
+combinando ARG2 con T100
+agregando ARG2 a worklist
+y salio por aca
+combinando ARG1 con T101
+agregando ARG1 a worklist
+y salio por aca
+agregando RV a worklist
+y salio por aca
+agregando T6 a worklist
+size: 1T6is NOT member
+combinando ARG2 con T24
+agregando ARG2 a worklist
+y salio por aca
+combinando ARG4 con T6
+agregando ARG4 a worklist
+y salio por aca
+agregando ARG3 a worklist
+y salio por aca
+agregando RV a worklist
+y salio por aca
+combinando ARG2 con T102
+agregando ARG2 a worklist
+y salio por aca
+combinando ARG1 con T103
+agregando ARG1 a worklist
+y salio por aca
+combinando RV con T7
+agregando RV a worklist
+y salio por aca
+agregando ARG2 a worklist
+y salio por aca
+agregando RV a worklist
+y salio por aca
+agregando ARG1 a worklist
+y salio por aca
+agregando FP a worklist
+y salio por aca
+combinando RV con T12
+agregando RV a worklist
+y salio por aca
+agregando ARG1 a worklist
+y salio por aca
+agregando RV a worklist
+y salio por aca
+combinando ARG1 con T25
+agregando ARG1 a worklist
+y salio por aca
+combinando T3 con T27
+agregando T3 a worklist
+size: 2T3is member
+agregando T3 a worklist
+size: 1T3is NOT member
+combinando T30 con T29
+agregando T30 a worklist
+size: 1T30is NOT member
+combinando T30 con T9
+agregando T30 a worklist
+y salio por aca
+agregando ARG2 a worklist
+y salio por aca
+agregando T2 a worklist
+y salio por aca
+combinando T35 con T34
+agregando T35 a worklist
+size: 1T35is NOT member
+combinando ARG1 con T33
+agregando ARG1 a worklist
+y salio por aca
+combinando RV con T8
+agregando RV a worklist
+y salio por aca
+combinando ARG2 con T38
+agregando ARG2 a worklist
+y salio por aca
+agregando FP a worklist
+y salio por aca
+agregando T18 a worklist
+size: 2T18is NOT member
+combinando ARG1 con T39
+agregando ARG1 a worklist
+y salio por aca
+agregando FP a worklist
+y salio por aca
+agregando T41 a worklist
+size: 2T41is NOT member
+agregando FP a worklist
+y salio por aca
+agregando T43 a worklist
+size: 2T43is NOT member
+agregando ARG3 a worklist
+y salio por aca
+agregando T1 a worklist
+y salio por aca
+agregando T1 a worklist
+y salio por aca
+agregando T47 a worklist
+size: 2T47is NOT member
+combinando T49 con T48
+agregando T49 a worklist
+size: 2T49is NOT member
+combinando ARG2 con T46
+agregando ARG2 a worklist
+y salio por aca
+agregando ARG1 a worklist
+y salio por aca
+agregando FP a worklist
+y salio por aca
+agregando T1 a worklist
+y salio por aca
+agregando T52 a worklist
+size: 2T52is NOT member
+combinando T54 con T53
+agregando T54 a worklist
+size: 2T54is NOT member
+agregando ARG2 a worklist
+y salio por aca
+agregando T2 a worklist
+y salio por aca
+combinando ARG3 con T51
+agregando ARG3 a worklist
+y salio por aca
+agregando FP a worklist
+y salio por aca
+agregando T58 a worklist
+size: 2T58is NOT member
+combinando T57 con T56
+agregando T57 a worklist
+size: 2T57is NOT member
+combinando ARG2 con T57
+agregando ARG2 a worklist
+y salio por aca
+added T30 to selectstack
+added T2 to selectstack
+added T77 to selectstack
+Nodo ARG1 con alias ARG1 es adyacente a T77 y su color es 2removing 2safedelist
+Nodo ARG2 con alias ARG2 es adyacente a T77 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T77 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T77 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T77 y su color es 0removing 0safedelist
+Nodo T10 con alias RV es adyacente a T77 y su color es 0removing 0safedelist
+Nodo T4 con alias ARG2 es adyacente a T77 y su color es 3removing 3safedelist
+Nodo T79 con alias ARG1 es adyacente a T77 y su color es 2removing 2safedelist
+Nodo T80 con alias T81 es adyacente a T77 pero no esta coloreado
+Nodo T81 con alias T81 es adyacente a T77 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T77 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T77 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T77 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T77 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T77 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T77 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T77 pero no esta coloreado
+coloreado T77 con 5
+Nodo ARG1 con alias ARG1 es adyacente a T2 y su color es 2removing 2safedelist
+Nodo ARG2 con alias ARG2 es adyacente a T2 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T2 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T2 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T2 y su color es 0removing 0safedelist
+Nodo T20 con alias T20 es adyacente a T2 pero no esta coloreado
+Nodo T21 con alias T22 es adyacente a T2 pero no esta coloreado
+Nodo T22 con alias T22 es adyacente a T2 pero no esta coloreado
+Nodo T23 con alias T23 es adyacente a T2 pero no esta coloreado
+Nodo T24 con alias ARG2 es adyacente a T2 y su color es 3removing 3safedelist
+Nodo T25 con alias ARG1 es adyacente a T2 y su color es 2removing 2safedelist
+Nodo T26 con alias T26 es adyacente a T2 pero no esta coloreado
+Nodo T27 con alias T3 es adyacente a T2 pero no esta coloreado
+Nodo T28 con alias T28 es adyacente a T2 pero no esta coloreado
+Nodo T29 con alias T30 es adyacente a T2 pero no esta coloreado
+Nodo T3 con alias T3 es adyacente a T2 pero no esta coloreado
+Nodo T30 con alias T30 es adyacente a T2 pero no esta coloreado
+Nodo T31 con alias T31 es adyacente a T2 pero no esta coloreado
+Nodo T32 con alias T32 es adyacente a T2 pero no esta coloreado
+Nodo T9 con alias T30 es adyacente a T2 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T2 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T2 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T2 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T2 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T2 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T2 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T2 pero no esta coloreado
+coloreado T2 con 5
+Nodo ARG1 con alias ARG1 es adyacente a T30 y su color es 2removing 2safedelist
+Nodo ARG2 con alias ARG2 es adyacente a T30 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T30 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T30 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T30 y su color es 0removing 0safedelist
+Nodo T2 con alias T2 es adyacente a T30 y su color es 5removing 5safedelist
+Nodo T33 con alias ARG1 es adyacente a T30 y su color es 2removing 2safedelist
+Nodo T34 con alias T35 es adyacente a T30 pero no esta coloreado
+Nodo T35 con alias T35 es adyacente a T30 pero no esta coloreado
+Nodo T8 con alias RV es adyacente a T30 y su color es 0removing 0safedelist
+Nodo r10 con alias r10 es adyacente a T30 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T30 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T30 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T30 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T30 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T30 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T30 pero no esta coloreado
+coloreado T30 con 6
+Nodo ARG1 con alias ARG1 es adyacente a T93 y su color es 2removing 2safedelist
+Nodo FP con alias FP es adyacente a T93 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T93 y su color es 0removing 0safedelist
+Nodo T92 con alias T92 es adyacente a T93 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T93 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T93 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T93 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T93 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T93 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T93 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T93 pero no esta coloreado
+coloreado T93 con 3
+Nodo ARG1 con alias ARG1 es adyacente a T91 y su color es 2removing 2safedelist
+Nodo ARG2 con alias ARG2 es adyacente a T91 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T91 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T91 y su color es 1removing 1safedelist
+Nodo T90 con alias T90 es adyacente a T91 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T91 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T91 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T91 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T91 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T91 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T91 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T91 pero no esta coloreado
+coloreado T91 con 0
+Nodo FP con alias FP es adyacente a T87 y su color es 1removing 1safedelist
+Nodo T0 con alias ARG2 es adyacente a T87 y su color es 3removing 3safedelist
+Nodo T85 con alias T85 es adyacente a T87 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T87 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T87 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T87 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T87 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T87 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T87 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T87 pero no esta coloreado
+coloreado T87 con 0
+Nodo FP con alias FP es adyacente a T86 y su color es 1removing 1safedelist
+Nodo T0 con alias ARG2 es adyacente a T86 y su color es 3removing 3safedelist
+Nodo T85 con alias T85 es adyacente a T86 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T86 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T86 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T86 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T86 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T86 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T86 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T86 pero no esta coloreado
+coloreado T86 con 0
+Nodo ARG1 con alias ARG1 es adyacente a T84 y su color es 2removing 2safedelist
+Nodo ARG2 con alias ARG2 es adyacente a T84 y su color es 3removing 3safedelist
+Nodo FP con alias FP es adyacente a T84 y su color es 1removing 1safedelist
+Nodo T83 con alias T83 es adyacente a T84 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T84 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T84 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T84 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T84 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T84 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T84 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T84 pero no esta coloreado
+coloreado T84 con 0
+Nodo ARG2 con alias ARG2 es adyacente a T82 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T82 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T82 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T82 y su color es 0removing 0safedelist
+Nodo T11 con alias T77 es adyacente a T82 y su color es 5removing 5safedelist
+Nodo T80 con alias T81 es adyacente a T82 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T82 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T82 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T82 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T82 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T82 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T82 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T82 pero no esta coloreado
+coloreado T82 con 2
+Nodo ARG3 con alias ARG3 es adyacente a T78 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T78 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T78 y su color es 0removing 0safedelist
+Nodo T4 con alias ARG2 es adyacente a T78 y su color es 3removing 3safedelist
+Nodo T76 con alias T77 es adyacente a T78 y su color es 5removing 5safedelist
+Nodo r10 con alias r10 es adyacente a T78 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T78 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T78 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T78 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T78 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T78 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T78 pero no esta coloreado
+coloreado T78 con 2
+Nodo ARG1 con alias ARG1 es adyacente a T75 y su color es 2removing 2safedelist
+Nodo ARG2 con alias ARG2 es adyacente a T75 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T75 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T75 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T75 y su color es 0removing 0safedelist
+Nodo T74 con alias T74 es adyacente a T75 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T75 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T75 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T75 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T75 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T75 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T75 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T75 pero no esta coloreado
+coloreado T75 con 5
+Nodo ARG3 con alias ARG3 es adyacente a T71 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T71 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T71 y su color es 0removing 0safedelist
+Nodo T67 con alias ARG2 es adyacente a T71 y su color es 3removing 3safedelist
+Nodo r10 con alias r10 es adyacente a T71 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T71 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T71 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T71 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T71 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T71 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T71 pero no esta coloreado
+coloreado T71 con 2
+Nodo ARG3 con alias ARG3 es adyacente a T70 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T70 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T70 y su color es 0removing 0safedelist
+Nodo T69 con alias T69 es adyacente a T70 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T70 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T70 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T70 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T70 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T70 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T70 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T70 pero no esta coloreado
+coloreado T70 con 2
+Nodo FP con alias FP es adyacente a T66 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T66 y su color es 0removing 0safedelist
+Nodo T63 con alias T1 es adyacente a T66 pero no esta coloreado
+Nodo T64 con alias T65 es adyacente a T66 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T66 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T66 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T66 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T66 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T66 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T66 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T66 pero no esta coloreado
+coloreado T66 con 2
+Nodo ARG3 con alias ARG3 es adyacente a T60 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T60 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T60 y su color es 0removing 0safedelist
+Nodo T1 con alias T1 es adyacente a T60 pero no esta coloreado
+Nodo T56 con alias ARG2 es adyacente a T60 y su color es 3removing 3safedelist
+Nodo r10 con alias r10 es adyacente a T60 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T60 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T60 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T60 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T60 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T60 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T60 pero no esta coloreado
+coloreado T60 con 2
+Nodo ARG3 con alias ARG3 es adyacente a T59 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T59 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T59 y su color es 0removing 0safedelist
+Nodo T1 con alias T1 es adyacente a T59 pero no esta coloreado
+Nodo T58 con alias T58 es adyacente a T59 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T59 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T59 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T59 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T59 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T59 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T59 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T59 pero no esta coloreado
+coloreado T59 con 2
+Nodo FP con alias FP es adyacente a T55 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T55 y su color es 0removing 0safedelist
+Nodo T1 con alias T1 es adyacente a T55 pero no esta coloreado
+Nodo T52 con alias T52 es adyacente a T55 pero no esta coloreado
+Nodo T53 con alias T54 es adyacente a T55 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T55 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T55 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T55 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T55 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T55 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T55 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T55 pero no esta coloreado
+coloreado T55 con 2
+Nodo FP con alias FP es adyacente a T50 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T50 y su color es 0removing 0safedelist
+Nodo T1 con alias T1 es adyacente a T50 pero no esta coloreado
+Nodo T47 con alias T47 es adyacente a T50 pero no esta coloreado
+Nodo T48 con alias T49 es adyacente a T50 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T50 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T50 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T50 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T50 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T50 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T50 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T50 pero no esta coloreado
+coloreado T50 con 2
+Nodo ARG3 con alias ARG3 es adyacente a T45 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T45 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T45 y su color es 0removing 0safedelist
+Nodo T1 con alias T1 es adyacente a T45 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T45 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T45 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T45 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T45 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T45 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T45 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T45 pero no esta coloreado
+coloreado T45 con 2
+Nodo ARG2 con alias ARG2 es adyacente a T44 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T44 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T44 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T44 y su color es 0removing 0safedelist
+Nodo T43 con alias T43 es adyacente a T44 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T44 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T44 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T44 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T44 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T44 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T44 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T44 pero no esta coloreado
+coloreado T44 con 2
+Nodo ARG1 con alias ARG1 es adyacente a T42 y su color es 2removing 2safedelist
+Nodo ARG2 con alias ARG2 es adyacente a T42 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T42 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T42 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T42 y su color es 0removing 0safedelist
+Nodo T41 con alias T41 es adyacente a T42 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T42 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T42 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T42 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T42 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T42 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T42 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T42 pero no esta coloreado
+coloreado T42 con 5
+Nodo ARG2 con alias ARG2 es adyacente a T40 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T40 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T40 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T40 y su color es 0removing 0safedelist
+Nodo r10 con alias r10 es adyacente a T40 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T40 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T40 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T40 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T40 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T40 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T40 pero no esta coloreado
+coloreado T40 con 2
+Nodo ARG2 con alias ARG2 es adyacente a T37 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T37 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T37 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T37 y su color es 0removing 0safedelist
+Nodo T34 con alias T35 es adyacente a T37 pero no esta coloreado
+Nodo T9 con alias T30 es adyacente a T37 y su color es 6removing 6safedelist
+Nodo r10 con alias r10 es adyacente a T37 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T37 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T37 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T37 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T37 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T37 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T37 pero no esta coloreado
+coloreado T37 con 2
+Nodo ARG2 con alias ARG2 es adyacente a T36 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T36 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T36 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T36 y su color es 0removing 0safedelist
+Nodo T9 con alias T30 es adyacente a T36 y su color es 6removing 6safedelist
+Nodo r10 con alias r10 es adyacente a T36 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T36 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T36 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T36 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T36 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T36 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T36 pero no esta coloreado
+coloreado T36 con 2
+Nodo ARG3 con alias ARG3 es adyacente a T32 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T32 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T32 y su color es 0removing 0safedelist
+Nodo T2 con alias T2 es adyacente a T32 y su color es 5removing 5safedelist
+Nodo T29 con alias T30 es adyacente a T32 y su color es 6removing 6safedelist
+Nodo r10 con alias r10 es adyacente a T32 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T32 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T32 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T32 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T32 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T32 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T32 pero no esta coloreado
+coloreado T32 con 2
+Nodo ARG3 con alias ARG3 es adyacente a T31 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T31 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T31 y su color es 0removing 0safedelist
+Nodo T2 con alias T2 es adyacente a T31 y su color es 5removing 5safedelist
+Nodo r10 con alias r10 es adyacente a T31 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T31 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T31 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T31 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T31 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T31 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T31 pero no esta coloreado
+coloreado T31 con 2
+Nodo ARG3 con alias ARG3 es adyacente a T28 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T28 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T28 y su color es 0removing 0safedelist
+Nodo T2 con alias T2 es adyacente a T28 y su color es 5removing 5safedelist
+Nodo T27 con alias T3 es adyacente a T28 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T28 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T28 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T28 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T28 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T28 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T28 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T28 pero no esta coloreado
+coloreado T28 con 2
+Nodo ARG2 con alias ARG2 es adyacente a T26 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T26 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T26 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T26 y su color es 0removing 0safedelist
+Nodo T2 con alias T2 es adyacente a T26 y su color es 5removing 5safedelist
+Nodo T3 con alias T3 es adyacente a T26 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T26 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T26 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T26 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T26 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T26 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T26 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T26 pero no esta coloreado
+coloreado T26 con 2
+Nodo ARG3 con alias ARG3 es adyacente a T23 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T23 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T23 y su color es 0removing 0safedelist
+Nodo T2 con alias T2 es adyacente a T23 y su color es 5removing 5safedelist
+Nodo T21 con alias T22 es adyacente a T23 pero no esta coloreado
+Nodo T3 con alias T3 es adyacente a T23 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T23 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T23 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T23 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T23 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T23 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T23 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T23 pero no esta coloreado
+coloreado T23 con 2
+Nodo ARG3 con alias ARG3 es adyacente a T20 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T20 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T20 y su color es 0removing 0safedelist
+Nodo T2 con alias T2 es adyacente a T20 y su color es 5removing 5safedelist
+Nodo T3 con alias T3 es adyacente a T20 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T20 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T20 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T20 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T20 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T20 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T20 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T20 pero no esta coloreado
+coloreado T20 con 2
+Nodo ARG1 con alias ARG1 es adyacente a T19 y su color es 2removing 2safedelist
+Nodo ARG2 con alias ARG2 es adyacente a T19 y su color es 3removing 3safedelist
+Nodo ARG3 con alias ARG3 es adyacente a T19 y su color es 4removing 4safedelist
+Nodo FP con alias FP es adyacente a T19 y su color es 1removing 1safedelist
+Nodo RV con alias RV es adyacente a T19 y su color es 0removing 0safedelist
+Nodo T18 con alias T18 es adyacente a T19 pero no esta coloreado
+Nodo r10 con alias r10 es adyacente a T19 pero no esta coloreado
+Nodo r11 con alias r11 es adyacente a T19 pero no esta coloreado
+Nodo r12 con alias r12 es adyacente a T19 pero no esta coloreado
+Nodo r13 con alias r13 es adyacente a T19 pero no esta coloreado
+Nodo r14 con alias r14 es adyacente a T19 pero no esta coloreado
+Nodo r15 con alias r15 es adyacente a T19 pero no esta coloreado
+Nodo rbx con alias rbx es adyacente a T19 pero no esta coloreado
+coloreado T19 con 5
+Fail: nodo no encontrado en color:T22
