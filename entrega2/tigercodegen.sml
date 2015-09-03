@@ -149,7 +149,7 @@ let val ilist = ref (nil: tigerassem.instr list)
 			src = munchExp(e1),
 			dst = r
 			});
-			emit(OPER{assem = "MUL's0, 'd0\n",
+			emit(OPER{assem = "MUL 's0, 'd0\n",
 				src = [munchExp(e2),r],
 				dst = [r],
 				jump= NONE})))

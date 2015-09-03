@@ -38,7 +38,7 @@ val localsGap = 0 			(* bytes *)
 val calldefs = [rv]
 val specialregs = [rv, fp]
 val argregs = ["ARG1","ARG2", "ARG3", "ARG4", "ARG5", "ARG6"] (*Feli was here*)
-val callersaves = []
+val callersaves = [rv, "ARG4", "ARG3"]
 val calleesaves = ["rbx", "r10", "r11", "r12", "r13", "r14", "r15"]
 
 type frame = {
