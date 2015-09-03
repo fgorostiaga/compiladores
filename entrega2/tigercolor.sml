@@ -106,9 +106,9 @@ fun makeWorklist () = let val initial = (*precolored @*) (List.tabulate(tigertem
 								|aux (n::rest) (spwl,fwl,siwl)  =
 									let 
 										val degreen = tabBuscaDefaults(!degree,n,~1)
-										val (spwl,fwl,siwl) = if (degreen<0) then (spwl,fwl,siwl) else if degreen >= k then
+										val (spwl,fwl,siwl) = if (degreen<0) then (print ("Nodo "^n^" con degree nada\n");(spwl,fwl,siwl)) else if degreen >= k then
 											(add(spwl,n),fwl,siwl) else if moveRelated n then
-												(spwl,add(fwl,n),siwl) else
+												(spwl,(print ("adding "^n^" a freezewl\n");add(fwl,n)),siwl) else
 												(spwl,fwl,add(siwl,n))
 									in aux rest (spwl,fwl,siwl) end
 							in aux initial (empty String.compare,empty String.compare,empty String.compare) end
@@ -145,7 +145,7 @@ fun addWorklist u = (print ("agregando "^u^" a worklist\n");
 	if (not (listmember u precolored)) andalso (not (moveRelated u)) andalso (tabBuscaDefaults (!degree, u, 0) < k) then
 		(freezeWorklist := safeDelete(!freezeWorklist,u);
 		print ("size: "^Int.toString (numItems (!simplifyWorklist))^u^"is "^(if (member(!simplifyWorklist,u)) then "" else "NOT ")^"member\n");
-		simplifyWorklist := safeDelete(!simplifyWorklist,u)) else (print "y salio por aca\n"))
+		simplifyWorklist := add(!simplifyWorklist,u)) else (print "y salio por aca\n"))
 
 fun ok(t,r) = let val degreet = case tabBusca(t,!degree) of SOME x=>x|NONE=>raise Fail "Nnf"
 					in degreet < k orelse listmember t precolored orelse member(!adjSet,(t,r)) end
@@ -220,6 +220,7 @@ fun freeze graph = let
 						in (
 							freezeWorklist := safeDelete(!freezeWorklist,u);
 							simplifyWorklist := add(!simplifyWorklist,u);
+							print ("Freezing "^u^"\n");
 							freezeMoves u graph)
 						end
 
@@ -257,9 +258,10 @@ fun main fgraph nodes =
             if not (isEmpty(!simplifyWorklist)) then (simplify (); iterate ())
             else if not (isEmpty(!worklistMoves)) then (coalesce fgraph; iterate ())
             else if not (isEmpty(!freezeWorklist)) then (freeze fgraph; iterate ())
-			else if not (isEmpty(!spillWorklist)) then (selectSpill fgraph)
+			else if not (isEmpty(!spillWorklist)) then (selectSpill fgraph; iterate ())
 			else ()
 		val _ = iterate ()
+		val _ = print ("Size of freeze: "^Int.toString (numItems (!freezeWorklist))^"\n")
 		val _ = assignColors ()
 		val _ = print ("Select stack size: "^Int.toString (List.length (!selectStack)))
 		val _ = print ("Spilled nodes size: "^Int.toString (numItems (!spilledNodes)))
