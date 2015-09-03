@@ -25,9 +25,9 @@ val color = ref (tabNueva())
 val coloredNodes = ref (empty String.compare)
 val spilledNodes = ref (empty String.compare)
 
-val k = List.length (precolored@tigerframe.calleesaves)
+val k = List.length (tigerframe.fp :: tigerframe.callersaves@tigerframe.calleesaves)
 
-fun colorToString i = List.nth(precolored@tigerframe.calleesaves,i)
+fun colorToString i = List.nth(precolored@["rbx", "r10", "r11", "r12", "r13", "r14", "r15"],i)
 
 fun zip [] [] = []
 	|zip (x::xs) (y::ys) = (x,y) :: (zip xs ys)
