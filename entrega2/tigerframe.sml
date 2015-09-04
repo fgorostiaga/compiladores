@@ -38,8 +38,8 @@ val localsGap = 0 			(* bytes *)
 val calldefs = [rv]
 val specialregs = [rv, fp]
 val argregs = ["%rdi","%rsi", "%rdx", "%rcx", "%r8", "%r9"] (*Feli was here*)
-val callersaves = [rv, "%rcx", "%rdx"]
-val calleesaves = ["rbx", "r10", "r11", "r12", "r13", "r14", "r15", "%rdi","%rsi", "%r8", "%r9"]
+val callersaves = [rv, "%rcx", "%rdx", "%r10", "%r11"]
+val calleesaves = ["rbx", "r12", "r13", "r14", "r15"]
 
 type frame = {
 	name: string,
@@ -98,7 +98,7 @@ fun externalCall(s, l) = CALL(NAME s, l)
 fun procEntryExit1 (frame,body) = body
 
 fun procEntryExit2 (frame,body) = body @ [tigerassem.OPER {assem = "heres a node too\n",
-															src = [rv,fp]@calleesaves,
+															src = calleesaves,
 															dst = [],
 															jump = NONE }]
 
