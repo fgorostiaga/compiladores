@@ -21,12 +21,12 @@ open tigertree
 
 type level = int
 
-val fp = "FP"				(* frame pointer *)
+val fp = "%rbp"				(* frame pointer *)
 val sp = "SP"				(* stack pointer *)
-val rv = "RV"				(* return value  *)
+val rv = "%rax"				(* return value  *)
 val ov = "OV"				(* overflow value (edx en el 386) *)
-val wSz = 4					(* word size in bytes *)
-val log2WSz = 2				(* base two logarithm of word size in bytes *)
+val wSz = 8					(* word size in bytes *)
+val log2WSz = 3				(* base two logarithm of word size in bytes *)
 val fpPrev = 0				(* offset (bytes) *)
 val fpPrevLev = 8			(* offset (bytes) *)
 val argsInicial = 0			(* words *)
@@ -37,9 +37,9 @@ val localsInicial = 0		(* words *)
 val localsGap = 0 			(* bytes *)
 val calldefs = [rv]
 val specialregs = [rv, fp]
-val argregs = ["ARG1","ARG2", "ARG3", "ARG4", "ARG5", "ARG6"] (*Feli was here*)
-val callersaves = [rv, "ARG4", "ARG3"]
-val calleesaves = ["rbx", "r10", "r11", "r12", "r13", "r14", "r15", "ARG1","ARG2", "ARG5", "ARG6"]
+val argregs = ["%rdi","%rsi", "%rdx", "%rcx", "%r8", "%r9"] (*Feli was here*)
+val callersaves = [rv, "%rcx", "%rdx"]
+val calleesaves = ["rbx", "r10", "r11", "r12", "r13", "r14", "r15", "%rdi","%rsi", "%r8", "%r9"]
 
 type frame = {
 	name: string,
@@ -88,7 +88,7 @@ fun allocArg (f: frame) b =
 fun allocLocal (f: frame) b = 
 	case b of
 	true =>
-		let	val ret = InFrame(((!(#actualLocal f))+(!(#actualArg f)))*wSz)
+		let	val ret = InFrame(((!(#actualLocal f))+(!(#actualArg f))+argsOffInicial)*wSz)
 		in	#actualLocal f:=(!(#actualLocal f)-1); ret end
 	| false => InReg(tigertemp.newtemp())
 fun exp(InFrame k) = MEM(BINOP(PLUS, TEMP(fp), CONST k)) (*Deberia usar el e?*)
