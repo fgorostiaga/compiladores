@@ -461,13 +461,25 @@ fun transExp(venv, tenv) =
 			val _ = List.map print (List.map Ir (frags))
 			val _ = print "----------------\n"
 			val (a,b) = otroCanonizeFrag res
-			val instrs = codegen2 frags
+			val framedinstrs = codegen2 frags
+			val instrs = List.concat (List.map (fn (_,b)=>b) framedinstrs)
 			val assems = List.map (format (fn x=>x)) instrs
 			val _ = List.map print assems
 			val (fgraph,nodes) = tigermakegraph.instrs2graph instrs
 			val (insarray, outsarray, adjSet,color, colortostring) = tigercolor.main fgraph nodes
-			val assems = List.map (format (fn x=>case tabBusca(x,color) of SOME i => colortostring i | NONE => raise Fail ("nocoloreado "^x))) instrs
-			val _ = List.map print assems
+			val wrappedinstrs = let
+					fun aux (NONE,instrs) = {prolog= "", body=instrs, epilog= ""}
+						|aux(SOME frame, instrs) = tigerframe.procEntryExit3 (frame, instrs)
+				in
+					List.map aux framedinstrs
+				end
+
+			val assems = let
+					fun printframe {prolog,body,epilog} = prolog :: (List.map (format (fn x=>case tabBusca(x,color) of SOME i => colortostring i | NONE => raise Fail ("nocoloreado "^x))) body) @ [epilog]
+				in
+					List.concat (List.map printframe wrappedinstrs)
+				end
+			val _ = (print ".global _tigermain\n"; List.map print assems)
 			val _ = print (".-.-.-"^ Int.toString(List.length (tabClaves adjSet)))
 			val _ = tabAAplica (print, (fn set => (print "{"; Splayset.app (fn x => (print x;print ", ")) set ;print "}\n")), adjSet)
 			val _ = Array.appi (fn (i, temps) => (print ("\nLiveins at node "^Int.toString(i)^": "); Splayset.app(fn t=>print (t^", ")) temps)) insarray

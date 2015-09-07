@@ -102,9 +102,9 @@ fun procEntryExit2 (frame,body) = body @ [tigerassem.OPER {assem = "heres a node
 															dst = [],
 															jump = NONE }]
 
-fun procEntryExit3 ({name, ...}:frame, body) = (*No se donde ni cuando se usa esto*)
-	{prolog = "PROCEDURE "^name^" \n",
+fun procEntryExit3 ({name, ...}:frame, body) =
+	{prolog = "PROCEDURE "^name^" \n"^"pushq %rbp\nsubq $8, %rsp\nmovq %rsp, $rbp\n",
 	body = body,
-	epilog = "END "^name^"\n"}
+	epilog = "END "^name^"\n"^"addq $8, %rbp\nleave\nret"}
 
 end

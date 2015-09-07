@@ -149,7 +149,7 @@ let val ilist = ref (nil: tigerassem.instr list)
 			src = munchExp(e1),
 			dst = r
 			});
-			emit(OPER{assem = "MUL 's0, 'd0\n",
+			emit(OPER{assem = "IMULQ 's0, 'd0\n",
 				src = [munchExp(e2),r],
 				dst = [r],
 				jump= NONE})))
@@ -199,7 +199,7 @@ end
 			|aux (x::xs) = aux2 x @ aux xs
 		fun aux3 [] = []
 		| aux3(h::t) = (case h of
-								(PROC {body,frame} :: _) => procEntryExit2 (frame,aux h) @ aux3 t
-								|_ => aux h @ aux3 t
+								(PROC {body,frame} :: _) => (SOME frame, procEntryExit2 (frame,aux h)) :: aux3 t
+								|_ => (NONE, aux h) :: aux3 t
 							)
 	in	aux3 fragss end
