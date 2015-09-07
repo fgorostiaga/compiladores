@@ -36,10 +36,10 @@ val regInicial = 1			(* reg *)
 val localsInicial = 0		(* words *)
 val localsGap = 0 			(* bytes *)
 val calldefs = [rv]
-val specialregs = [rv, fp]
+val specialregs = [fp]
 val argregs = ["%rdi","%rsi", "%rdx", "%rcx", "%r8", "%r9"] (*Feli was here*)
-val callersaves = [rv, "%rcx", "%rdx", "%r10", "%r11"]
-val calleesaves = ["rbx", "r12", "r13", "r14", "r15"]
+val callersaves = [rv, "%r10", "%r11"]@argregs
+val calleesaves = ["%rbx", "%r12", "%r13", "%r14", "%r15"]
 
 type frame = {
 	name: string,

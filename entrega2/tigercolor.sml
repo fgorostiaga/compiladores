@@ -5,7 +5,7 @@ open tigergraph
 open tigerflow
 open Splayset
 
-val precolored = tigerframe.specialregs @ tigerframe.argregs
+val precolored = tigerframe.specialregs @ tigerframe.callersaves @ tigerframe.calleesaves
 val adjSet = ref (empty (fn ((u0,v0),(u1,v1)) => if u0=u1 then String.compare(v0,v1) else String.compare(u0,u1)))
 val adjList = ref (tabNueva ())
 val degree = ref (tabInserList(tabNueva(), List.map (fn x => (x,99999999)) precolored))
@@ -25,9 +25,9 @@ val color = ref (tabNueva())
 val coloredNodes = ref (empty String.compare)
 val spilledNodes = ref (empty String.compare)
 
-val k = List.length (tigerframe.fp :: tigerframe.callersaves@tigerframe.calleesaves)
+val k = List.length precolored
 
-fun colorToString i = List.nth(precolored@["%rbx", "%r10", "%r11", "%r12", "%r13", "%r14", "%r15"],i)
+fun colorToString i = List.nth(precolored,i)
 
 fun zip [] [] = []
 	|zip (x::xs) (y::ys) = (x,y) :: (zip xs ys)
