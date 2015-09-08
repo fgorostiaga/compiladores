@@ -52,63 +52,63 @@ let val ilist = ref (nil: tigerassem.instr list)
 			  src = [],
 			  jump = SOME [e]})
 	|   munchStm(CJUMP(EQ,e1,e2,l1,l2)) =
-		emit(OPER{assem = "CMP 's1, 's0 <CR> "
+		emit(OPER{assem = "CMP 's1, 's0\n"
 				  ^ "JE 'j0 \n",
 			  dst = [],
 			  src = [munchExp(e1),munchExp(e2)],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(NE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's1, 's0 <CR> "
+		emit(OPER{assem = "CMP 's1, 's0\n"
 				  ^ "JNE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(LT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's1, 's0 <CR> "
+		emit(OPER{assem = "CMP 's1, 's0\n"
 				  ^ "JL 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 
 	|   munchStm(CJUMP(GT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's1, 's0 <CR> "
+		emit(OPER{assem = "CMP 's1, 's0\n"
 				  ^ "JG 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 
 	|   munchStm(CJUMP(LE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's1, 's0 <CR> "
+		emit(OPER{assem = "CMP 's1, 's0\n"
 				  ^ "JLE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(GE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's1, 's0 <CR> "
+		emit(OPER{assem = "CMP 's1, 's0\n"
 				  ^ "JGE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(ULT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's1, 's0 <CR> "
+		emit(OPER{assem = "CMP 's1, 's0\n"
 				  ^ "JB 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(ULE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's1, 's0 <CR> "
+		emit(OPER{assem = "CMP 's1, 's0\n"
 				  ^ "JBE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(UGT,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's1, 's0 <CR> "
+		emit(OPER{assem = "CMP 's1, 's0\n"
 				  ^ "JA 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],
 			  jump = SOME [l1,l2]})
 	|   munchStm(CJUMP(UGE,e1,e2,l1,l2)) =	
-		emit(OPER{assem = "CMP 's1, 's0 <CR> "
+		emit(OPER{assem = "CMP 's1, 's0\n"
 				  ^ "JAE 'j0 \n",
 			  src = [munchExp(e1),munchExp(e2)],
 			  dst = [],

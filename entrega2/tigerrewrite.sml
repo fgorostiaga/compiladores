@@ -15,19 +15,28 @@ fun rewriteprogram framedinstrs spilledNodes : (tigerframe.frame option * tigera
 				let
 					val srcspilled = (member(spilledNodes,src))
 					val dstspilled = (member(spilledNodes,dst))
-					val instr = if not srcspilled andalso not dstspilled then MOVE {assem=assem, dst=dst, src=src} else
-						let val assemforsrc = if srcspilled then (myIntToString (getSpilledNodeOffset src rtab frame))^"('s0)" else "'s0"
-							val newsrc = if srcspilled then tigerframe.fp else src
-							val assemfordst = if dstspilled then (myIntToString (getSpilledNodeOffset dst rtab frame))^"('d0)" else "'d0"
-							val newdst = if dstspilled then tigerframe.fp else dst
-						in
-							(OPER {assem = "MOV "^assemforsrc^", "^assemfordst^"\n",
-								src = [newsrc],
-								dst = [newdst],
-								jump=NONE
-							})
-						end
-				in instr :: (rewriteframe frame instrs rtab) end
+					val manyinstrs = if not srcspilled andalso not dstspilled then [MOVE {assem=assem, dst=dst, src=src}] else
+						if srcspilled andalso dstspilled then
+							let val pushinstr = (OPER {assem = "push %rax\n", src=[], dst=[], jump=NONE})
+								val firstmovinstr = (OPER {assem = "mov "^(myIntToString (getSpilledNodeOffset src rtab frame))^"(%rbp), %rax\n", src=[], dst=[], jump=NONE})
+								val sndmovinstr = (OPER {assem = "mov %rax, "^(myIntToString (getSpilledNodeOffset dst rtab frame))^"(%rbp)\n", src=[], dst=[], jump=NONE})
+								val popinstr = (OPER {assem = "pop %rax\n", src=[], dst=[], jump=NONE})
+							in
+								[pushinstr, firstmovinstr, sndmovinstr, popinstr]
+							end
+						else
+							let val assemforsrc = if srcspilled then (myIntToString (getSpilledNodeOffset src rtab frame))^"('s0)" else "'s0"
+								val newsrc = if srcspilled then tigerframe.fp else src
+								val assemfordst = if dstspilled then (myIntToString (getSpilledNodeOffset dst rtab frame))^"('d0)" else "'d0"
+								val newdst = if dstspilled then tigerframe.fp else dst
+							in
+								[(OPER {assem = "MOV "^assemforsrc^", "^assemfordst^"\n",
+									src = [newsrc],
+									dst = [newdst],
+									jump=NONE
+								})]
+							end
+				in manyinstrs @ (rewriteframe frame instrs rtab) end
 			|rewriteframe frame (OPER {assem, src, dst, jump}::instrs) rtab =
 				let
 					val localspillednodes = intersection(addList(emptyset,src@dst), spilledNodes)

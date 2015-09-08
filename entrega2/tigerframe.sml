@@ -97,16 +97,16 @@ fun externalCall(s, l) = CALL(NAME s, l)
 
 fun procEntryExit1 (frame,body) = body
 
-fun procEntryExit2 (frame,body) = body @ [tigerassem.OPER {assem = "heres a node too\n",
+fun procEntryExit2 (frame,body) = body @ [tigerassem.OPER {assem = "",
 															src = calleesaves,
 															dst = [],
 															jump = NONE }]
 
 fun myIntToString n = if n<0 then ("-"^(myIntToString (~n))) else (Int.toString n)
 fun procEntryExit3 ({name, actualLocal, actualArg,...}:frame, body) =
-	{prolog = "PROCEDURE "^name^" \n"^"pushq %rbp\nsubq $"^(myIntToString wSz)^", %rsp\nmovq %rsp, %rbp\n"
+	{prolog = "pushq %rbp\nsubq $"^(myIntToString wSz)^", %rsp\nmovq %rsp, %rbp\n"
 		^"subq $"^(myIntToString (~((!actualLocal)+(!actualArg))*wSz))^", %rsp\n",
 	body = body,
-	epilog = "END "^name^"\n"^"addq $8, %rbp\nleave\nret\n"}
+	epilog = "addq $8, %rbp\nleave\nret\n"}
 
 end
