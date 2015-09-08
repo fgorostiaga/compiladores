@@ -462,11 +462,19 @@ fun transExp(venv, tenv) =
 			val _ = print "----------------\n"
 			val (a,b) = otroCanonizeFrag res
 			val framedinstrs = codegen2 frags
-			val instrs = List.concat (List.map (fn (_,b)=>b) framedinstrs)
-			val assems = List.map (format (fn x=>x)) instrs
-			val _ = List.map print assems
-			val (fgraph,nodes) = tigermakegraph.instrs2graph instrs
-			val (insarray, outsarray, adjSet,color, colortostring) = tigercolor.main fgraph nodes
+			(*por aca ciclaremos*)
+			fun iterate framedinstrs = let
+					val instrs = List.concat (List.map (fn (_,b)=>b) framedinstrs)
+					val assems = List.map (format (fn x=>x)) instrs
+					val _ = List.map print assems
+					val (fgraph,nodes) = tigermakegraph.instrs2graph instrs
+					val (insarray, outsarray, adjSet,color, colortostring, spilledNodes) = tigercolor.main fgraph nodes
+				in
+					if (Splayset.isEmpty spilledNodes) then (insarray, outsarray, adjSet,color, colortostring, spilledNodes, framedinstrs) else
+						iterate (tigerrewrite.rewriteprogram framedinstrs spilledNodes)
+				end
+			(*hasta aca*)
+			val (insarray, outsarray, adjSet,color, colortostring, spilledNodes, framedinstrs) = iterate framedinstrs
 			val wrappedinstrs = let
 					fun aux (NONE,instrs) = {prolog= "", body=instrs, epilog= ""}
 						|aux(SOME frame, instrs) = tigerframe.procEntryExit3 (frame, instrs)

@@ -265,4 +265,4 @@ fun main fgraph nodes =
 		val _ = assignColors ()
 		val _ = print ("Select stack size: "^Int.toString (List.length (!selectStack)))
 		val _ = print ("Spilled nodes size: "^Int.toString (numItems (!spilledNodes)))
-	in (insarray,outsarray, !adjList,!color, colorToString) end
+	in (insarray,outsarray, !adjList,!color, colorToString, !spilledNodes) end

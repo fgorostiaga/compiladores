@@ -28,11 +28,12 @@ let val ilist = ref (nil: tigerassem.instr list)
 				  dst = i,
 				  src = rv}))
 	|   munchStm(tigertree.MOVE(TEMP i,BINOP(PLUS,CONST j,e1))) =  (*Por que esta este "MEM"? El pattern no deberia matchear mas bien con MOVE (TEMP i, BINOP(PLUS,CONST j, MEM(m))) ? *)
-		emit(MOVE{assem = "MOV 's0, " ^(Int.toString j) ^ "('d0)\n", (*La forma no deberia ser MOV 'd0, j('s0)?*)
-			  dst = i,
-			  src = munchExp(e1)})
+		emit(OPER{assem = "MOV 's0, " ^(myIntToString j) ^ "('d0)\n", (*La forma no deberia ser MOV 'd0, j('s0)?*)
+			  dst = [i],
+			  src = [munchExp(e1)],
+			  jump=NONE})
 	|   munchStm(tigertree.MOVE(TEMP i, CONST j)) = 
-		emit(OPER{assem = "MOV $" ^ (Int.toString j) ^ ", 'd0 \n", (*Hay que cambiar los OPER por MOVE cuando sea necesario. Aca, por ejemplo, no lo es. ;P*)
+		emit(OPER{assem = "MOV $" ^ (myIntToString j) ^ ", 'd0 \n", (*Hay que cambiar los OPER por MOVE cuando sea necesario. Aca, por ejemplo, no lo es. ;P*)
 			  dst = [i],
 			  src = [],
 			  jump = NONE})
@@ -122,7 +123,7 @@ let val ilist = ref (nil: tigerassem.instr list)
 	(* munchExp::Tree.exp -> tigertemp.temp *)
 
 	 munchExp(CONST i) = (*no estoy seguro de esta. 'd0 deberia tener 0*)
-		result(fn r => emit(OPER{assem = "MOV $"^(Int.toString i)^", 'd0 \n",
+		result(fn r => emit(OPER{assem = "MOV $"^(myIntToString i)^", 'd0 \n",
 			src = [],
 			dst = [r],
 			jump = NONE})) 

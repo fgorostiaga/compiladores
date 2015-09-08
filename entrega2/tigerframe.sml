@@ -102,8 +102,10 @@ fun procEntryExit2 (frame,body) = body @ [tigerassem.OPER {assem = "heres a node
 															dst = [],
 															jump = NONE }]
 
-fun procEntryExit3 ({name, ...}:frame, body) =
-	{prolog = "PROCEDURE "^name^" \n"^"pushq %rbp\nsubq $8, %rsp\nmovq %rsp, $rbp\n",
+fun myIntToString n = if n<0 then ("-"^(myIntToString (~n))) else (Int.toString n)
+fun procEntryExit3 ({name, actualLocal,...}:frame, body) =
+	{prolog = "PROCEDURE "^name^" \n"^"pushq %rbp\nsubq $"^(myIntToString wSz)^", %rsp\nmovq %rsp, %rbp\n"
+		^"subq $"^(myIntToString (~(!actualLocal)*wSz))^", %rsp\n",
 	body = body,
 	epilog = "END "^name^"\n"^"addq $8, %rbp\nleave\nret"}
 

@@ -32,5 +32,6 @@ datatype frag = PROC of {body: tigertree.stm, frame: frame}
 val getArgForPos : int -> access
 val argregs : tigertemp.temp list
 val specialregs : tigertemp.temp list
+val myIntToString : int -> string
 
 end
