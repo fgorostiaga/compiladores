@@ -386,8 +386,8 @@ fun transExp(venv, tenv) =
 																										SOME (Func {formals, extern, result, level, label}) => (level, result = TUnit)
 																										| _ => raise Fail "No deberia pasar")
 																	val _ = checkf (fs,env)
-																	val (newvenv,initArgsExps) = addformals(env,ps)
 																	val _ = pushLevel funLevel
+																	val (newvenv,initArgsExps) = addformals(env,ps)
 																	val {exp=expbody, ty=t} = transExp(newvenv, tenv) b
 																	val expArgsAndBody = seqExp(initArgsExps@[expbody])
 																	val _ = popLevel ()

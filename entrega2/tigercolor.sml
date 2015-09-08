@@ -5,7 +5,7 @@ open tigergraph
 open tigerflow
 open Splayset
 
-val precolored = tigerframe.specialregs @ tigerframe.callersaves @ tigerframe.calleesaves
+val precolored = tigerframe.callersaves @ tigerframe.calleesaves @ tigerframe.specialregs
 val adjSet = ref (empty (fn ((u0,v0),(u1,v1)) => if u0=u1 then String.compare(v0,v1) else String.compare(u0,u1)))
 val adjList = ref (tabNueva ())
 val degree = ref (tabInserList(tabNueva(), List.map (fn x => (x,99999999)) precolored))
@@ -25,7 +25,7 @@ val color = ref (tabNueva())
 val coloredNodes = ref (empty String.compare)
 val spilledNodes = ref (empty String.compare)
 
-val k = List.length precolored
+val k = List.length precolored-1 (*fp NO*)
 
 fun colorToString i = List.nth(precolored,i)
 
@@ -188,8 +188,8 @@ fun coalesce (FGRAPH {control, def, use, ismove}) = let val wlist = listItems (!
 															else if listmember v precolored orelse member(!adjSet, (u,v)) then
 																(constrainedMoves := add(!constrainedMoves,m);
 																addWorklist(u);addWorklist(v))
-															else if (listmember u precolored andalso (foldl (fn (t,b) => b andalso (ok(t,u))) true (adjacent v)))
-																	orelse (not (listmember u precolored) andalso (conservative(union(adjacent(u),adjacent(v))))) then
+															else if ((listmember u precolored andalso (foldl (fn (t,b) => b andalso (ok(t,u))) true (adjacent v)))
+																	orelse (not (listmember u precolored) andalso (conservative(union(adjacent(u),adjacent(v)))))) andalso not (u="%rbp") then
 																(coalescedMoves := add(!coalescedMoves,m);
 																combine(u,v);
 																addWorklist(u))
@@ -242,7 +242,7 @@ fun assignColors () =
 																val _ = print ("Nodo "^w^" con alias "^getAlias w^" es adyacente a "^n^" y su color es "^Int.toString colorgetaliasw)
 															in safeListDelete(colors,colorgetaliasw) end
 															else (print ("Nodo "^w^" con alias "^getAlias w^" es adyacente a "^n^" pero no esta coloreado\n");colors)) inicolors adjListn
-									val _ = case okColors of (c::xs) =>(coloredNodes := add(!coloredNodes,n); color := tabRInserta(n,c,!color); print ("coloreado "^n^" con "^Int.toString c^"\n"))
+									val _ = case okColors of (c::xs) =>(coloredNodes := add(!coloredNodes,n); color := tabRInserta(n,c,!color); print ("coloreado "^n^" con "^Int.toString c^" con string "^colorToString c^"\n"))
 															| [] => spilledNodes := (print "SPILLING!\n";add(!spilledNodes,n))
 								in (aux rest) end
 	in (aux (!selectStack); selectStack := []) end
