@@ -13,20 +13,20 @@ let val ilist = ref (nil: tigerassem.instr list)
 	(* munchStm::Tree.stm -> unit *)
 	fun munchStm(SEQ(a, b)) = (munchStm a; munchStm b)(*primer stm*)
 	(*comenzamos por el final, para ir de los arboles mas simples a los mas complejos. Feli dice: no es al reves? Ir de los mas complejos a los mas simples?*)
-	|	munchStm (EXP(CALL (NAME n,args))) = (*Procedure*)
+	(*|	munchStm (EXP(CALL (NAME n,args))) = (*Procedure*)
 			emit(OPER{assem="CALL "^n^"\n",
 						src=munchArgs (List.rev args),
 						dst=callersaves,
 						jump=NONE})
-	|	munchStm (tigertree.MOVE(TEMP i, TEMP j)) =
-			emit(MOVE{assem = "MOV 's0, 'd0\n",
-					dst = i,
-					src = j})
 	|	munchStm (tigertree.MOVE(TEMP i,CALL (NAME n,args))) = (*Function call*)
 			(munchStm(EXP(CALL(NAME n,args)));
 			emit(MOVE{assem = "MOV 's0, 'd0 \n",
 				  dst = i,
-				  src = rv}))
+				  src = rv}))*)
+	|	munchStm (tigertree.MOVE(TEMP i, TEMP j)) =
+			emit(MOVE{assem = "MOV 's0, 'd0\n",
+					dst = i,
+					src = j})
 	|   munchStm(tigertree.MOVE(TEMP i,BINOP(PLUS,CONST j,e1))) =  (*Por que esta este "MEM"? El pattern no deberia matchear mas bien con MOVE (TEMP i, BINOP(PLUS,CONST j, MEM(m))) ? *)
 		emit(OPER{assem = "MOV 's0, " ^(myIntToString j) ^ "('d0)\n", (*La forma no deberia ser MOV 'd0, j('s0)?*)
 			  dst = [i],
@@ -180,7 +180,7 @@ let val ilist = ref (nil: tigerassem.instr list)
 														src=[],
 														jump=NONE}))
 	|	munchExp (CALL (NAME n,args)) =
-			result (fn r=> (emit(OPER{assem="CALL "^n^"\n",
+			result (fn r=> (emit(OPER{assem="MOV $0, %rax\nCALL "^n^"\n",
 							src=munchArgs (List.rev args),
 							dst=callersaves,
 							jump=NONE});
