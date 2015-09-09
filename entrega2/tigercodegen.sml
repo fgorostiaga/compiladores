@@ -138,13 +138,20 @@ let val ilist = ref (nil: tigerassem.instr list)
 				jump= NONE})))
 	|    munchExp(BINOP(DIV,e1,e2)) =
 		result(fn r => (emit(MOVE{assem =  "MOV 's0, 'd0\n",
-			src = munchExp(e1),
-			dst = r
+				src = munchExp(e1),
+				dst = tigerframe.rv
 			});
-			emit(OPER{assem = "DIV 's0, 'd0\n",
-				src = [munchExp(e2),r],
-				dst = [r],
-				jump= NONE})))
+			emit (OPER {assem = "cltd\n",
+				src = [tigerframe.rv],
+				dst = [tigerframe.rv, "%edx"],
+				jump = NONE});
+			emit(OPER{assem = "IDIVQ 's0\n",
+				src = [munchExp(e2), tigerframe.rv],
+				dst = [tigerframe.rv],
+				jump= NONE});
+			emit (MOVE {assem = "MOV 's0, 'd0\n",
+				src = tigerframe.rv,
+				dst = r})))
 	|    munchExp(BINOP(MUL,e1,e2)) =
 		result(fn r => (emit(MOVE{assem =  "MOV 's0, 'd0\n",
 			src = munchExp(e1),
@@ -172,6 +179,14 @@ let val ilist = ref (nil: tigerassem.instr list)
 														dst=[r],
 														src=[],
 														jump=NONE}))
+	|	munchExp (CALL (NAME n,args)) =
+			result (fn r=> (emit(OPER{assem="CALL "^n^"\n",
+							src=munchArgs (List.rev args),
+							dst=callersaves,
+							jump=NONE});
+						emit (MOVE {assem = "MOV 's0, 'd0\n",
+							src=tigerframe.rv,
+							dst=r})))
 	|	munchExp exp = result (fn r=>emit(OPER{assem="NADA: "^(ppEXP exp)^"\n",src=[], dst=[], jump=NONE}))
 
 	and munchArgs [] = []
