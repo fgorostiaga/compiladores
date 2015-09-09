@@ -221,7 +221,13 @@ fun freeze graph = let
 						end
 
 fun selectSpill graph = let
-						val m = List.hd (listItems (!spillWorklist)) (*deberia usar una heuristica copada*)
+							fun choosethemin (str, currentmin) = let
+									val myindex = case Int.fromString (String.extract (str, 1, NONE)) of SOME x=>x | NONE => raise Fail ("no se pudo sustraer el indice de "^str)
+								in if myindex < currentmin then myindex else currentmin end
+
+							val minindex = foldl choosethemin (tigertemp.lastTempIndex ()) (!spillWorklist)
+							val m = "T"^Int.toString minindex
+							val index = case Int.fromString (String.extract (m, 1, NONE)) of SOME x=>x | NONE => raise Fail ("no se pudo con "^m)
 						in
 							(spillWorklist := safeDelete(!spillWorklist,m);
 							simplifyWorklist := add(!simplifyWorklist,m);
@@ -256,4 +262,4 @@ fun main fgraph nodes =
 			else ()
 		val _ = iterate ()
 		val _ = assignColors ()
-	in (insarray,outsarray, !adjList,!color, colorToString, !spilledNodes) end
+	in (!color, colorToString, !spilledNodes) end

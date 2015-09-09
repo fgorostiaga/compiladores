@@ -464,13 +464,13 @@ fun transExp(venv, tenv) =
 					val instrs = List.concat (List.map (fn (_,b)=>b) framedinstrs)
 					val assems = List.map (format (fn x=>x)) instrs
 					val (fgraph,nodes) = tigermakegraph.instrs2graph instrs
-					val (insarray, outsarray, adjSet,color, colortostring, spilledNodes) = tigercolor.main fgraph nodes
+					val (color, colortostring, spilledNodes) = tigercolor.main fgraph nodes
 				in
-					if (Splayset.isEmpty spilledNodes) then (insarray, outsarray, adjSet,color, colortostring, spilledNodes, framedinstrs) else
+					if (Splayset.isEmpty spilledNodes) then (color, colortostring, spilledNodes, framedinstrs) else
 						iterate (tigerrewrite.rewriteprogram framedinstrs spilledNodes)
 				end
 			(*hasta aca*)
-			val (insarray, outsarray, adjSet,color, colortostring, spilledNodes, framedinstrs) = iterate framedinstrs
+			val (color, colortostring, spilledNodes, framedinstrs) = iterate framedinstrs
 			val wrappedinstrs = let
 					fun aux (NONE,instrs) = {prolog= "", body=instrs, epilog= ""}
 						|aux(SOME frame, instrs) = tigerframe.procEntryExit3 (frame, instrs)
