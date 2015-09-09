@@ -58,7 +58,7 @@ fun addEdge(u,v) =
 
 
 fun findInTab(x,tab) = case tabBusca(x,tab) of SOME s=>addList(empty String.compare,s) | NONE => raise Fail "Nodo no encontrado"
-fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
+fun build (FGRAPH {control, def, use, ismove}) nodes outstab =
 	let
 		val _ = adjSet := (empty (fn ((u0,v0),(u1,v1)) => if u0=u1 then String.compare(v0,v1) else String.compare(u0,u1)))
 		val _ = adjList := (tabNueva ())
@@ -79,7 +79,7 @@ fun build (FGRAPH {control, def, use, ismove}) nodes outsarray =
 
 		fun aux [] moveList worklistMoves _ = (moveList, worklistMoves)
 			|aux (instr :: rest) moveList worklistMoves i =
-				let val live = sub(outsarray, i)
+				let val live = case tabBusca(instr, outstab) of SOME x => x | NONE => raise Fail "NNEncontrado!"
 					val (live, moveList, worklistMoves) = case tabBusca(instr,ismove) of
 						SOME false => (live,moveList,worklistMoves)
 						|SOME true => let val useI = findInTab(instr,use)
@@ -249,8 +249,8 @@ fun assignColors () =
 	in (aux (!selectStack); selectStack := []) end
 
 fun main fgraph nodes = 
-	let val (insarray, outsarray) = livenessAnalisis (fgraph, nodes)
-		val (a,b) = build fgraph nodes outsarray
+	let val (instab, outstab) = livenessAnalisis (fgraph, nodes)
+		val (a,b) = build fgraph nodes outstab
 		val _ = (moveList := a; worklistMoves := b)
 		val (a, b, c) = makeWorklist ()
 		val _ = (spillWorklist := a; freezeWorklist :=b; simplifyWorklist:=c)
