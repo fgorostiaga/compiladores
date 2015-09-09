@@ -30,8 +30,7 @@ fun main(args) =
 		val _ = findEscape(expr)
 		val _ = if arbol then tigerpp.exprAst expr else ()
 	in
-		transProg(expr);
-		print "yes!!\n"
+		transProg(expr)
 	end	handle Fail s => ( print("Fail: "^s^"\n"); exit failure )
 
 val _ = main(CommandLine.arguments())

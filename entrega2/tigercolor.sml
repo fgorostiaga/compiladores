@@ -35,7 +35,7 @@ fun zip [] [] = []
 
 fun safeDelete(s,i) = if member(s,i) then delete(s,i) else s
 
-fun safeListDelete (xs,i) = (print ("removing "^Int.toString i^"safedelist\n");List.filter (fn x => x<>i) xs)
+fun safeListDelete (xs,i) = List.filter (fn x => x<>i) xs
 
 
 fun listmember _ [] = false
@@ -106,9 +106,9 @@ fun makeWorklist () = let val initial = (*precolored @*) (List.tabulate(tigertem
 								|aux (n::rest) (spwl,fwl,siwl)  =
 									let 
 										val degreen = tabBuscaDefaults(!degree,n,~1)
-										val (spwl,fwl,siwl) = if (degreen<0) then (print ("Nodo "^n^" con degree nada\n");(spwl,fwl,siwl)) else if degreen >= k then
+										val (spwl,fwl,siwl) = if (degreen<0) then (spwl,fwl,siwl) else if degreen >= k then
 											(add(spwl,n),fwl,siwl) else if moveRelated n then
-												(spwl,(print ("adding "^n^" a freezewl\n");add(fwl,n)),siwl) else
+												(spwl,add(fwl,n),siwl) else
 												(spwl,fwl,add(siwl,n))
 									in aux rest (spwl,fwl,siwl) end
 							in aux initial (empty String.compare,empty String.compare,empty String.compare) end
@@ -135,17 +135,15 @@ fun simplify () = let
   						val _ = simplifyWorklist := delete(!simplifyWorklist,n)
 					in
 						(selectStack := (n :: !selectStack);
-						print ("added "^n^" to selectstack\n");
 						app (fn m => (decrementdegree m)) (adjacent n))
 					end
 
 fun getAlias n = if member(!coalescedNodes,n) then getAlias (case tabBusca(n,!alias) of SOME x=>x|NONE=>raise Fail "nnf") else n
 
-fun addWorklist u = (print ("agregando "^u^" a worklist\n");
+fun addWorklist u = 
 	if (not (listmember u precolored)) andalso (not (moveRelated u)) andalso (tabBuscaDefaults (!degree, u, 0) < k) then
 		(freezeWorklist := safeDelete(!freezeWorklist,u);
-		print ("size: "^Int.toString (numItems (!simplifyWorklist))^u^"is "^(if (member(!simplifyWorklist,u)) then "" else "NOT ")^"member\n");
-		simplifyWorklist := add(!simplifyWorklist,u)) else (print "y salio por aca\n"))
+		simplifyWorklist := add(!simplifyWorklist,u)) else ()
 
 fun ok(t,r) = let val degreet = case tabBusca(t,!degree) of SOME x=>x|NONE=>raise Fail "Nnf"
 					in degreet < k orelse listmember t precolored orelse member(!adjSet,(t,r)) end
@@ -161,7 +159,6 @@ fun combine (u,v) = (if member(!freezeWorklist,v) then
 					else
 						spillWorklist := safeDelete(!spillWorklist,v);
 					coalescedNodes := add(!coalescedNodes,v);
-					print ("combinando "^u^" con "^v^"\n");
 					alias:=tabRInserta(v,u,!alias);
 					let val moveListu = case tabBusca(u,!moveList) of SOME x=>x | NONE=>raise Fail "nodo no encontrado"
 						val moveListv = case tabBusca(v,!moveList) of SOME x=>x | NONE=>raise Fail "nodo no encontrado"
@@ -220,7 +217,6 @@ fun freeze graph = let
 						in (
 							freezeWorklist := safeDelete(!freezeWorklist,u);
 							simplifyWorklist := add(!simplifyWorklist,u);
-							print ("Freezing "^u^"\n");
 							freezeMoves u graph)
 						end
 
@@ -239,11 +235,10 @@ fun assignColors () =
 									val adjListn = case tabBusca(n,!adjList) of SOME x=>x|NONE=> raise Fail "nne en adjlist"
 									val okColors = foldl (fn (w,colors) => if (member(addList(!coloredNodes,precolored),getAlias w)) then
 															let val colorgetaliasw = case tabBusca(getAlias w, !color) of SOME x=>x | NONE => raise Fail "nodo no encontrado en 2color2"
-																val _ = print ("Nodo "^w^" con alias "^getAlias w^" es adyacente a "^n^" y su color es "^Int.toString colorgetaliasw)
 															in safeListDelete(colors,colorgetaliasw) end
-															else (print ("Nodo "^w^" con alias "^getAlias w^" es adyacente a "^n^" pero no esta coloreado\n");colors)) inicolors adjListn
-									val _ = case okColors of (c::xs) =>(coloredNodes := add(!coloredNodes,n); color := tabRInserta(n,c,!color); print ("coloreado "^n^" con "^Int.toString c^" con string "^colorToString c^"\n"))
-															| [] => spilledNodes := (print "SPILLING!\n";add(!spilledNodes,n))
+															else colors) inicolors adjListn
+									val _ = case okColors of (c::xs) =>(coloredNodes := add(!coloredNodes,n); color := tabRInserta(n,c,!color))
+															| [] => spilledNodes := add(!spilledNodes,n)
 								in (aux rest) end
 	in (aux (!selectStack); selectStack := []) end
 
@@ -253,7 +248,6 @@ fun main fgraph nodes =
 		val _ = (moveList := a; worklistMoves := b)
 		val (a, b, c) = makeWorklist ()
 		val _ = (spillWorklist := a; freezeWorklist :=b; simplifyWorklist:=c)
-		val _ = print ("Size of simp: "^Int.toString (numItems (!simplifyWorklist))^"\n")
 		fun iterate () =
             if not (isEmpty(!simplifyWorklist)) then (simplify (); iterate ())
             else if not (isEmpty(!worklistMoves)) then (coalesce fgraph; iterate ())
@@ -261,8 +255,5 @@ fun main fgraph nodes =
 			else if not (isEmpty(!spillWorklist)) then (selectSpill fgraph; iterate ())
 			else ()
 		val _ = iterate ()
-		val _ = print ("Size of freeze: "^Int.toString (numItems (!freezeWorklist))^"\n")
 		val _ = assignColors ()
-		val _ = print ("Select stack size: "^Int.toString (List.length (!selectStack)))
-		val _ = print ("Spilled nodes size: "^Int.toString (numItems (!spilledNodes)))
 	in (insarray,outsarray, !adjList,!color, colorToString, !spilledNodes) end

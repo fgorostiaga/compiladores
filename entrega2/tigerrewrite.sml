@@ -59,7 +59,7 @@ fun rewriteprogram framedinstrs spilledNodes : (tigerframe.frame option * tigera
 
 
 		and getSpilledNodeOffset temp rtab frame = case tabBusca(temp, !rtab) of SOME n => n
-													|NONE => let val tempoffset = (case allocLocal frame true of InFrame n=>(print ("alloclocal en frame "^(name frame)^" devolvio "^myIntToString n^"\n");n)
+													|NONE => let val tempoffset = (case allocLocal frame true of InFrame n=>n
 																												|_=> raise Fail "allocLocal devolvio inreg??")
 																in (rtab:= tabRInserta(temp, tempoffset, !rtab); tempoffset) end
 	in
