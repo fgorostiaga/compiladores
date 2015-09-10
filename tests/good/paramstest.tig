@@ -1,0 +1,6 @@
+let
+ type myrec = { a:int, b:int, c:int, d:int, e:int, f:int, g:int, h:int, i:int, j:int, k:int, l:int, m:int} 
+ var a :myrec:=myrec{ a=90, b=90, c=90, d=90, e=90, f=90, g=90, h=90, i=90, j=90, k=90, l=90, m=90}
+in
+ print (chr(a.m))
+end
