@@ -31,6 +31,6 @@ fun livenessAnalisis (FGRAPH {control, def, use, ismove}, nodeList) : (tigertemp
 								val _ = update(outsarray, n, List.foldl (fn (index,set) => union (set, sub(insarray,index))) (empty String.compare) (getSuccsIndexes n))
 							in equal(insn', sub(insarray,n)) andalso equal(outsn', sub(outsarray,n)) end
 
-		fun iterate () = if List.foldl (fn (i,res) => updateArrays i andalso res) true (List.tabulate (listlen, (fn x=>x))) then () else iterate ()
+		fun iterate () = if List.foldl (fn (i,res) => updateArrays i andalso res) true (List.tabulate (listlen, (fn x=>listlen-1-x))) then () else iterate ()
 
 	in (iterate ();(insarray, outsarray)) end
